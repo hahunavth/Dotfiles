@@ -4,3 +4,5 @@
 .config/onedrive/config
 .config/onedrive/
 .local/share/gnome-shell
+.themes
+.icons
