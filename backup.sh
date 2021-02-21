@@ -1,6 +1,6 @@
 #!/bin/sh
 
-git pull origin master
+git pull origin main
 while read f; do
     echo "Backup file $f..."
     cp -rf $HOME/$f ./
