@@ -1,0 +1,25 @@
+/* Add your custom extension styling here */
+.color-picker-menu {
+    width: 240px;
+}
+
+.active .color-picker {
+    color: deepskyblue;
+}
+
+.color-picker-button:hover {
+    color: deepskyblue;
+}
+
+.color-picker-history:hover {
+    color: pink;
+}
+
+.color-picker-collection {
+    color: pink;
+}
+
+.color-picker-collection:hover {
+    color: deepskyblue;
+}
+

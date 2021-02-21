@@ -1,0 +1,139 @@
+
+.new-task-box {
+  padding-left: 15px;
+  padding-right: 15px;
+}
+
+.new-task-entry {
+  margin-top: 10px;
+  margin-left: 25px;
+  margin-right: 50px;
+  text-align: center;
+  width: 150px;
+}
+
+.new-task-slider {
+  margin-top: 15px;
+  width: 200px;
+}
+
+.new-task-header {
+  font-size: 20px;
+  width: 400 px;
+  vertical-align: middle;
+  text-align: center;
+}
+
+.time-label {
+  margin-top: 10px;
+  font-size: 20px;
+  width: 100px;
+  vertical-align: middle;
+  text-align: center;
+}
+
+.enter-button {
+  margin-top: 10px;
+  text-align: center;
+}
+
+.task-box {
+  margin-top: 5px;
+  padding-left: 15px;
+  width: 400px;
+}
+
+.task {
+  margin-top: 5px;
+  background-color: #FF0000;
+  background-image: url('icons/progress_bar.png');
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  border-radius: 7px;
+}
+
+.delete_button {
+  margin-right: 0px;
+  padding-right: 0px;
+  text-align: right;
+}
+
+.label {
+  width: 120px;
+}
+.durationLabel {
+  text-align: center;
+  width: 140px;
+}
+
+.settings-box {
+  padding-left: 5px;
+  padding-right: 15px;
+  width: 399px;
+}
+
+.time-slider {
+  margin-left: 15px;
+  margin-right: 15px;
+  width: 270px;
+}
+
+.settings-label {
+  width: 100px;
+}
+
+.weekday-label {
+  margin-bottom: 5px;
+  font-size: 12px;
+  width: 44px;
+  text-align: center;
+  text-decoration: underline;
+}
+
+.weekday-times {
+  font-size: 10px;
+  width: 44px;
+  text-align: center;
+}
+
+.weekday-header {
+  font-size: 10px;
+  width: 40px;
+}
+
+.button-box {
+  padding-left: 20px;
+  width: 100px;
+  text-align: center;
+  spacing: 10px;
+}
+
+.move-buttons {
+  width: 12px;
+  height: 6px;
+}
+
+.move-box {
+  margin-top: 2px;
+  width: 12px;
+  height: 12px;
+}
+
+.description-label {
+  width: 380px;
+  font-size: 12px;
+}
+
+.description-btn {
+  width: 380px;
+  font-size: 12px;
+
+}
+
+.settings-mainbox {
+  height: 400px;
+  background-color: blue;
+}
+
+.task-buttons {
+}

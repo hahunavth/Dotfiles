@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<application-state>
+  <context id="">
+    <application id="gnome-control-center.desktop" score="32" last-seen="1613841011"/>
+    <application id="gnome-session-properties.desktop" score="1" last-seen="1613883584"/>
+    <application id="sublime_text.desktop" score="7" last-seen="1613825499"/>
+    <application id="gnome-language-selector.desktop" score="11" last-seen="1613836924"/>
+    <application id="firefox.desktop" score="2994" last-seen="1613907069"/>
+    <application id="org.gnome.tweaks.desktop" score="324" last-seen="1613889292"/>
+    <application id="vlc.desktop" score="0" last-seen="1613822565"/>
+    <application id="atom-beta.desktop" score="4" last-seen="1613846343"/>
+    <application id="org.gnome.Shell.Extensions.GSConnect.Preferences.desktop" score="0" last-seen="1613825732"/>
+    <application id="org.gnome.eog.desktop" score="6" last-seen="1613875879"/>
+    <application id="org.gnome.Characters.desktop" score="16" last-seen="1613883586"/>
+    <application id="software-properties-gtk.desktop" score="5" last-seen="1613902054"/>
+    <application id="gdebi.desktop" score="3" last-seen="1613835389"/>
+    <application id="code.desktop" score="48" last-seen="1613885244"/>
+    <application id="thunderbird.desktop" score="2" last-seen="1613883219"/>
+    <application id="org.gnome.Software.desktop" score="8" last-seen="1613885228"/>
+    <application id="shotwell.desktop" score="2" last-seen="1613846403"/>
+    <application id="gnome-initial-setup.desktop" score="18" last-seen="1613813898"/>
+    <application id="org.gnome.Extensions.desktop" score="428" last-seen="1613891574"/>
+    <application id="libreoffice-writer.desktop" score="4" last-seen="1613902369"/>
+    <application id="org.gnome.Calendar.desktop" score="13" last-seen="1613889553"/>
+    <application id="org.gnome.Shell.Extensions.desktop" score="56" last-seen="1613891878"/>
+    <application id="org.gnome.Terminal.desktop" score="762" last-seen="1613907076"/>
+    <application id="org.gnome.Nautilus.desktop" score="408" last-seen="1613907078"/>
+    <application id="org.gnome.Mines.desktop" score="39" last-seen="1613883239"/>
+    <application id="snap-store_ubuntu-software.desktop" score="51" last-seen="1613903218"/>
+    <application id="org.gnome.FileRoller.desktop" score="53" last-seen="1613876881"/>
+    <application id="org.gnome.Evince.desktop" score="608" last-seen="1613895821"/>
+    <application id="org.gnome.Totem.desktop" score="0" last-seen="1613869650"/>
+    <application id="gnome-system-monitor.desktop" score="420" last-seen="1613903936"/>
+    <application id="com.github.joseexposito.touche.desktop" score="22" last-seen="1613817835"/>
+    <application id="google-chrome.desktop" score="45" last-seen="1613895832"/>
+    <application id="synaptic.desktop" score="15" last-seen="1613842126"/>
+    <application id="teams.desktop" score="735" last-seen="1613902301"/>
+    <application id="rhythmbox.desktop" score="0" last-seen="1613835944"/>
+    <application id="org.gnome.gedit.desktop" score="18" last-seen="1613905608"/>
+  </context>
+</application-state>

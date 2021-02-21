@@ -1,0 +1,9 @@
+{
+  "name": "Fildem global menu",
+  "description": "Global menu for Ubuntu 20",
+  "shell-version": [
+    "3.36"
+  ],
+  "url": "https://github.com/gonzaarcr/Fildem",
+  "uuid": "fildemGMenu@gonza.com"
+}

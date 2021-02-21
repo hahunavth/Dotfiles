@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist gettext-domain="gnome-shell-extensions-notes">
+  <schema path="/org/gnome/shell/extensions/notes/" id="org.gnome.shell.extensions.notes">
+    <key type="as" name="toggle-notes-view">
+      <default>["&lt;Super&gt;n"]</default>
+      <summary>Shortcut to open notes view.</summary>
+      <description>Shortcut used to open notes view.</description>
+    </key>
+    <key type="i" name="animation-ms">
+      <default>700</default>
+      <summary>Length of add/remove animations</summary>
+      <description>Length of add/remove animations in milliseconds.</description>
+    </key>
+    <key type="i" name="sync-interval-s">
+      <default>900</default>
+      <summary>Interval between note syncs</summary>
+      <description>Interval in seconds between each sync.</description>
+    </key>
+    <key type="b" name="enable-owncloud">
+      <default>false</default>
+      <summary>Enable ownCloud sync</summary>
+    </key>
+    <key type="b" name="owncloud-https">
+      <default>true</default>
+      <summary>Use Secure HTTP</summary>
+    </key>
+  </schema>
+</schemalist>
