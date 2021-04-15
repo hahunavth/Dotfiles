@@ -6,3 +6,5 @@
 .local/share/gnome-shell
 .themes
 .icons
+.autojump
+.oh-my-zsh

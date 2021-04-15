@@ -2,13 +2,13 @@
 <application-state>
   <context id="">
     <application id="gnome-control-center.desktop" score="58" last-seen="1618440850"/>
-    <application id="com.jetbrains.IntelliJ-IDEA-Community.desktop" score="2619" last-seen="1618485831"/>
+    <application id="com.jetbrains.IntelliJ-IDEA-Community.desktop" score="2632" last-seen="1618486297"/>
     <application id="blueman-manager.desktop" score="3" last-seen="1618047151"/>
     <application id="xdg-desktop-portal-gtk.desktop" score="7.5" last-seen="1618380841"/>
     <application id="libreoffice-impress.desktop" score="9" last-seen="1618011244"/>
     <application id="org.kde.ark.desktop" score="7" last-seen="1617970761"/>
     <application id="org.gnome.Maps.desktop" score="2" last-seen="1618319736"/>
-    <application id="firefox.desktop" score="14571.5" last-seen="1618486180"/>
+    <application id="firefox.desktop" score="14572.5" last-seen="1618486449"/>
     <application id="cpu-x.desktop" score="2" last-seen="1617977325"/>
     <application id="gvim.desktop" score="198" last-seen="1618227179"/>
     <application id="libreoffice-startcenter.desktop" score="0" last-seen="1618235503"/>
@@ -41,11 +41,11 @@
     <application id="org.gnome.Calendar.desktop" score="0.5" last-seen="1617971522"/>
     <application id="org.videolan.VLC.desktop" score="85" last-seen="1618236690"/>
     <application id="org.flatpak.qtdemo.desktop" score="0" last-seen="1618068030"/>
-    <application id="org.gnome.Terminal.desktop" score="11647.5" last-seen="1618485987"/>
+    <application id="org.gnome.Terminal.desktop" score="11658.5" last-seen="1618486444"/>
     <application id="org.gnome.PackageUpdater.desktop" score="0" last-seen="1618387214"/>
     <application id="org.gnome.Nautilus.desktop" score="1997" last-seen="1618402028"/>
     <application id="org.openshot.OpenShot.desktop" score="4.5" last-seen="1617963019"/>
-    <application id="gnome-system-monitor.desktop" score="41" last-seen="1618486181"/>
+    <application id="gnome-system-monitor.desktop" score="46" last-seen="1618486365"/>
     <application id="org.gnome.Shell.PortalHelper.desktop" score="5" last-seen="1617948859"/>
     <application id="org.gnome.Evince.desktop" score="719.5" last-seen="1618377092"/>
     <application id="com.google.AndroidStudio.desktop" score="1.5" last-seen="1617964744"/>
@@ -55,7 +55,7 @@
     <application id="teams.desktop" score="19" last-seen="1617962983"/>
     <application id="org.gtk.Demo4.desktop" score="18" last-seen="1618230180"/>
     <application id="org.gnome.Builder.desktop" score="68.5" last-seen="1618380402"/>
-    <application id="org.rnd2.cpupower_gui.desktop" score="15" last-seen="1618486182"/>
+    <application id="org.rnd2.cpupower_gui.desktop" score="18" last-seen="1618486363"/>
     <application id="org.eclipse.Javascript.desktop" score="12" last-seen="1617978349"/>
     <application id="org.gnome.gedit.desktop" score="25" last-seen="1618154107"/>
     <application id="com.wps.Office.wps.desktop" score="342" last-seen="1618010366"/>
