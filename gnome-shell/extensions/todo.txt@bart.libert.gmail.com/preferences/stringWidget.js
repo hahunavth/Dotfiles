@@ -15,16 +15,19 @@ var StringWidget = GObject.registerClass({
             hexpand: true
         });
         textFieldValue.set_text(this._settings.get(setting));
-        textFieldValue.connect('focus-out-event', (ignored_object) => {
+        const focusController = new Gtk.EventControllerFocus();
+        focusController.connect('leave', (ignored_object) => {
             log(`Setting ${setting} to ${textFieldValue.get_text()}`);
             this._settings.set(setting, textFieldValue.get_text());
         });
+        textFieldValue.add_controller(focusController);
+
         textFieldValue.connect('activate', (ignored_object) => {
             log(`Setting ${setting} to ${textFieldValue.get_text()}`);
             this._settings.set(setting, textFieldValue.get_text());
         });
         this._addHelp(textFieldValue);
-        this.box.add(textFieldValue);
+        this.box.append(textFieldValue);
     }
 });
 

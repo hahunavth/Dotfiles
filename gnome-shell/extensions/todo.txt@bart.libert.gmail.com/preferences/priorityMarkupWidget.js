@@ -1,19 +1,89 @@
-const GObject = imports.gi.GObject;
-const Gdk = imports.gi.Gdk;
-const Gtk = imports.gi.Gtk;
+const {Gdk, Gio, Gtk, GObject} = imports.gi;
 
 const Extension = imports.misc.extensionUtils.getCurrentExtension();
-const ButtonCellRenderer = Extension.imports.preferences.buttonCellRenderer;
 const Markup = Extension.imports.markup.Markup;
+const Utils = Extension.imports.utils;
 
 const Gettext = imports.gettext.domain('todotxt');
 const _ = Gettext.gettext;
 
-const COL_PRIORITY = 0;
-const COL_CHANGE_COLOR = 1;
-const COL_COLOR = 2;
-const COL_BOLD = 3;
-const COL_ITALIC = 4;
+const ATTR_CHANGE_COLOR = 'colorStyling';
+const ATTR_BOLD = 'bold';
+const ATTR_ITALIC = 'italic';
+
+const PriorityMarkupSetting = GObject.registerClass({
+    GTypeName: 'PriorityMarkupSetting'
+}, class PriorityMarkupSetting extends GObject.Object {
+    _init() {
+        super._init();
+        this._priority = '';
+        this._styleColor = false;
+        this._color = 0;
+        this._bold = false;
+        this._italic = false;
+    }
+
+    set priority(priority) {
+        if (!Utils.isValid(priority) || priority < 'A' || priority > 'Z') {
+            log(`invalid priority ${priority}`);
+        }
+        this._priority = priority;
+    }
+
+    get priority() {
+        return this._priority;
+    }
+
+    set color(color) {
+        if (!Utils.isValid(color)) {
+            log(`invalid color ${color}`);
+        }
+        this._color = color;
+        this._styleColor = true;
+    }
+
+    get color() {
+        return this._color;
+    }
+
+    set colorStyling(enabled) {
+        if (!Utils.isValid(enabled)) {
+            log(`invalid color styling setting ${enabled}`);
+        }
+        this._styleColor = !!enabled;
+    }
+
+    get colorStyling() {
+        return this._styleColor;
+    }
+
+    set bold(enabled) {
+        if (!Utils.isValid(enabled)) {
+            log(`invalid bold setting ${enabled}`);
+        }
+        this._bold = !!enabled;
+    }
+
+    get bold() {
+        return this._bold;
+    }
+
+    set italic(enabled) {
+        if (!Utils.isValid(enabled)) {
+            log(`invalid italic setting ${enabled}`);
+        }
+        this._italic = !!enabled;
+    }
+
+    get italic() {
+        return this._italic;
+    }
+
+    print() {
+        return `Prio: ${this.priority}, color: ${this._styleColor} ${this.color},
+            bold: ${this.bold}, italic: ${this.italic}`;
+    }
+});
 
 /* exported PriorityMarkupWidget */
 var PriorityMarkupWidget = GObject.registerClass({
@@ -63,14 +133,18 @@ var PriorityMarkupWidget = GObject.registerClass({
     }
 
 
-    _checkPriorityCondition(model, check_function, message) {
-        let [validIterator, iter] = model.get_iter_first(); // eslint-disable-line prefer-const
+    _checkPriorityCondition(model, check_function, message, priorityToBeAdded) {
         let result = true;
-        let priority = '@';
-        while (validIterator && result) {
-            priority = model.get_value(iter, COL_PRIORITY);
-            result = check_function(priority);
-            validIterator = model.iter_next(iter);
+        const priority = '@';
+        for (let i = 0; i < model.get_n_items(); i++) {
+            result = result && check_function(model.get_item(i).priority);
+            if (!result) {
+                break;
+            }
+        }
+
+        if (result && Utils.isValid(priorityToBeAdded)) {
+            result = result && check_function(priorityToBeAdded);
         }
         if (!result) {
             const dialog = new Gtk.MessageDialog({
@@ -78,25 +152,30 @@ var PriorityMarkupWidget = GObject.registerClass({
                 text: `${message}: ${priority}`,
                 message_type: Gtk.MessageType.ERROR
             });
-            dialog.run();
-            dialog.destroy();
+            dialog.connect('response', (dialog, ignored_response) => {
+                dialog.destroy();
+            });
+            dialog.show();
             return false;
         }
         return true;
     }
 
-    _checkForInvalidPriorities(model) {
-        return this._checkPriorityCondition(model, (priority) => {
+    _checkForInvalidPriorities(priorityToBeAdded) {
+        return this._checkPriorityCondition(this.model, (priority) => {
             return (/^[A-Z]$/).test(priority);
         },
-        _("Wrong priority"));
+        _("Wrong priority"),
+        priorityToBeAdded);
     }
 
-    _checkForDuplicatePriorities(model) {
+    _checkForDuplicatePriorities(priorityToBeAdded) {
         const seenPriorities = [];
-        let [validIterator, iter] = model.get_iter_first(); // eslint-disable-line prefer-const
-        while (validIterator) {
-            const priority = model.get_value(iter, COL_PRIORITY);
+        if (Utils.isValid(priorityToBeAdded)) {
+            seenPriorities.push(priorityToBeAdded);
+        }
+        for (let i = 0; i < this.model.get_n_items(); i++) {
+            const priority = this.model.get_item(i).priority;
             if (!seenPriorities.includes(priority)) {
                 seenPriorities.push(priority);
             } else {
@@ -105,82 +184,93 @@ var PriorityMarkupWidget = GObject.registerClass({
                     text: _("Duplicate priority: %(priority)").replace('%(priority)', priority),
                     message_type: Gtk.MessageType.ERROR
                 });
-                dialog.run();
-                dialog.destroy();
+                dialog.connect('response', (dialog, ignored_response) => {
+                    dialog.destroy();
+                });
+                dialog.show();
                 return false;
             }
-            validIterator = model.iter_next(iter);
         }
         return true;
     }
 
-    _validateModel(model) {
-        if (!this._checkForDuplicatePriorities(model)) {
+    _validateModel(priorityToBeAdded) {
+        if (!this._checkForDuplicatePriorities(priorityToBeAdded)) {
             return false;
         }
-        if (!this._checkForInvalidPriorities(model)) {
+        if (!this._checkForInvalidPriorities(priorityToBeAdded)) {
             return false;
         }
         return true;
     }
 
-    _updatePriorityStylingFromModelRow(model, row, replace_prio) {
-        if (!this._validateModel(model)) {
-            model.remove(row);
+    _updatePriorityStylingFromListItem(listItem, replace_prio) {
+        if (!this._validateModel()) {
+            this.model.remove(listItem.get_position());
             return;
         }
-        this._updatePriorityStyling(
-            model.get_value(row, COL_PRIORITY), model.get_value(row, COL_CHANGE_COLOR), model.get_value(
-                row,
-                COL_COLOR), model.get_value(row, COL_BOLD), model.get_value(row, COL_ITALIC),
-            replace_prio);
+        const item = listItem.get_item();
+        this._updatePriorityStyling(item.priority, item.colorStyling, item.color, item.bold, item.italic, replace_prio);
     }
 
-    _buildToggleColumn(title, attribute_column, model) {
-        const column = new Gtk.TreeViewColumn({
-            title,
-            'expand': true
+    _buildToggleColumn(title, attribute) {
+        const factory = new Gtk.SignalListItemFactory();
+        factory.connect('setup', (factory, item) => {
+            const box = new Gtk.Box();
+            const MARGIN = 5;
+            const toggle = new Gtk.Switch({
+                hexpand: false,
+                vexpand: false,
+                margin_top: MARGIN,
+                margin_bottom: MARGIN,
+                margin_start: MARGIN,
+                margin_end: MARGIN
+            });
+            box.append(toggle);
+            item.set_child(box);
         });
 
-        const renderer = new Gtk.CellRendererToggle({
-            activatable: true
+        factory.connect('bind', (factory, listItem) => {
+            const toggle = listItem.get_child().get_first_child();
+            const item = listItem.get_item();
+            toggle.active = item[attribute];
+            this._connections[item] = toggle.connect('notify::active', (button) => {
+                log(`setting prio ${item.priority} ${attribute} to ${button.active}`);
+                item[attribute] = button.active;
+                this._updatePriorityStylingFromListItem(listItem);
+            });
         });
-        renderer.connect('toggled', (rend, iter) => {
-            const newActiveState = !rend.active;
-            const [returnCode, row] = model.get_iter_from_string(iter);
-            if (!returnCode) {
-                throw new Error('Something is broken!');
-            }
-            model.set(row, [attribute_column], [newActiveState]);
-            this._updatePriorityStylingFromModelRow(model, row);
+
+        factory.connect('unbind', (factory, item) => {
+            item.get_child().get_first_child().disconnect('notify::active', this._connections[item]);
         });
-        column.pack_start(renderer, true);
-        column.add_attribute(renderer, 'active', attribute_column);
-        return column;
+
+        return new Gtk.ColumnViewColumn({ title, factory, expand: false, resizable: true});
     }
 
-    _buildPriorityStyleWidget(model, row, priority, change_color, color, bold, italic) {
-        const newRow = model.insert(row);
-        model.set(newRow, [COL_PRIORITY, COL_CHANGE_COLOR, COL_COLOR, COL_BOLD, COL_ITALIC], [priority,
-            change_color, color, bold, italic]);
+    _addPriorityToModel(model, priority, change_color, color, bold, italic) {
+        const prioritySetting = new PriorityMarkupSetting();
+        prioritySetting.colorStyling = change_color;
+        prioritySetting.priority = priority;
+        prioritySetting.color = color;
+        prioritySetting.bold = bold;
+        prioritySetting.italic = italic;
+        model.append(prioritySetting);
+        log(`Added ${prioritySetting.print()}`);
     }
 
-    _buildPrioritiesFromSettings(parentContainer, startRow) {
+    _buildPrioritiesFromSettings() {
         this.prioritiesMarkup = this._settings.get('priorities-markup');
-        let i = 1;
         for (const markup in this.prioritiesMarkup) {
             if (Object.prototype.hasOwnProperty.call(this.prioritiesMarkup,markup)) {
-                this._buildPriorityStyleWidget(parentContainer,
-                    startRow + i,
+                this._addPriorityToModel(this.model,
                     markup,
                     this.prioritiesMarkup[markup].changeColor,
                     this.prioritiesMarkup[markup].color.to_string(),
                     this.prioritiesMarkup[markup].bold,
                     this.prioritiesMarkup[markup].italic);
-                i = i + 1; // eslint-disable-line no-magic-numbers
             }
         }
-        return i;
     }
 
     _init(setting, settings) {
@@ -189,92 +279,86 @@ var PriorityMarkupWidget = GObject.registerClass({
         this.orientation = Gtk.Orientation.VERTICAL;
         this.box.orientation = Gtk.Orientation.VERTICAL;
 
-        const scroller = new Gtk.ScrolledWindow();
-        const model = new Gtk.ListStore();
-        model.set_column_types([
-            GObject.TYPE_STRING, GObject.TYPE_BOOLEAN, GObject.TYPE_STRING, GObject.TYPE_BOOLEAN, GObject.TYPE_BOOLEAN
-        ]);
-        const START_ROW = 1;
-        this._buildPrioritiesFromSettings(model, START_ROW);
-        const treeview = new Gtk.TreeView({
-            'expand': true,
-            model
+        this._connections = {};
+
+        this.model = new Gio.ListStore({item_type: PriorityMarkupSetting});
+
+        this.selectionModel = new Gtk.SingleSelection({ model: this.model });
+
+        const columnView = new Gtk.ColumnView({model: this.selectionModel});
+
+        const PRIO_LENGTH = 1;
+
+        var prioFactory = new Gtk.SignalListItemFactory();
+        prioFactory.connect('setup', (factory, item) => {
+            const entry = new Gtk.Entry();
+            entry.set_max_length(PRIO_LENGTH);
+            item.set_child(entry);
+        });
+        prioFactory.connect('bind', (factory, item) => {
+            const entry = item.get_child();
+            item.get_child().get_buffer().set_text(item.get_item().priority, PRIO_LENGTH);
+            this._connections[item] = entry.get_buffer().connect('inserted-text',
+                (ignored_entry, ignored_position, chars, n_chars) => {
+                    if (n_chars > PRIO_LENGTH) {
+                        log('Something went wrong');
+                        return;
+                    }
+                    const oldPrio = item.get_item().priority;
+                    item.get_item().priority = chars;
+                    this._updatePriorityStylingFromListItem(item, oldPrio);
+                });
+        }
+        );
+
+        prioFactory.connect('unbind', (factory, item) => {
+            item.get_child().disconnect('notify::active', this._connections[item]);
         });
 
-        const prioCol = new Gtk.TreeViewColumn({
-            'title': _("Priority"),
-            'expand': true,
-            'sort-indicator': true,
-            'sort-column-id': COL_PRIORITY,
+        const prioCol = new Gtk.ColumnViewColumn({title: _("Priority"), factory: prioFactory});
+        columnView.append_column(prioCol);
+
+        columnView.append_column(this._buildToggleColumn(_("Change color"), ATTR_CHANGE_COLOR));
+        var colorFactory = new Gtk.SignalListItemFactory();
+        colorFactory.connect('setup', (factory, item) => {
+            item.set_child(new Gtk.ColorButton({modal: true}));
         });
-
-        const prioRend = new Gtk.CellRendererText({
-            editable: true
-        });
-
-        prioRend.connect('edited', (rend, iter, newPrio) => {
-            const [returnCode, row] = model.get_iter_from_string(iter);
-            if (!returnCode) {
-                throw new Error('Something is broken!');
-            }
-            const oldPrio = model.get_value(row, [COL_PRIORITY]);
-            model.set(row, [COL_PRIORITY], [newPrio]);
-            this._updatePriorityStylingFromModelRow(model, row, oldPrio);
-        });
-        prioCol.pack_start(prioRend, true);
-        prioCol.add_attribute(prioRend, 'text', COL_PRIORITY);
-
-        treeview.append_column(prioCol);
-
-        treeview.append_column(this._buildToggleColumn(_("Change color"), COL_CHANGE_COLOR, model));
-
-        const colorCol = new Gtk.TreeViewColumn({
-            'title': _("Color"),
-            'expand': true,
-        });
-
-        const colorRend = new ButtonCellRenderer.ButtonCellRenderer({
-            activatable: true
-        });
-        colorRend.connect('clicked', (rend, iter) => {
-            const [returnCode, row] = model.get_iter_from_string(iter);
-            if (!returnCode) {
-                throw new Error('Something is broken!');
-            }
-            const oldColor = new Gdk.RGBA();
-            oldColor.parse(model.get_value(row, [COL_COLOR]));
-            const colorChooser = new Gtk.ColorChooserDialog({
-                modal: true,
-                rgba: oldColor
+        colorFactory.connect('bind', (factory, item) => {
+            const colorButton = item.get_child();
+            const color = new Gdk.RGBA();
+            color.parse(item.get_item().color);
+            colorButton.set_rgba(color);
+            this._connections[item] = colorButton.connect('color-set', () => {
+                const oldColor = new Gdk.RGBA();
+                oldColor.parse(item.get_item().color);
+                const newColor = colorButton.get_rgba();
+                item.get_item().color = newColor.to_string();
+                this._updatePriorityStylingFromListItem(item);
             });
-            if (colorChooser.run() == Gtk.ResponseType.OK) {
-                const newColor = colorChooser.get_rgba();
-                model.set(row, [COL_COLOR], [newColor.to_string()]);
-                this._updatePriorityStylingFromModelRow(model, row);
-            }
-            colorChooser.destroy();
+        }
+        );
+
+        const colorCol = new Gtk.ColumnViewColumn({title: _("Color"), factory: colorFactory});
+        columnView.append_column(colorCol);
+        columnView.append_column(this._buildToggleColumn(_("Bold"), ATTR_BOLD));
+        columnView.append_column(this._buildToggleColumn(_("Italic"), ATTR_ITALIC));
+
+        const MIN_SCROLLER_HEIGHT = 200;
+        const scroller = new Gtk.ScrolledWindow();
+        scroller.set_child(columnView);
+        scroller.set_min_content_height(MIN_SCROLLER_HEIGHT);
+        this.box.append(scroller);
+
+        this._buildPrioritiesFromSettings();
+
+        const toolbar = new Gtk.Box();
+        toolbar.add_css_class('toolbar');
+
+        const addButton = new Gtk.Button({
+            icon_name: 'list-add',
+            label: _("Add style")
         });
-        colorCol.pack_start(colorRend, true);
-        colorCol.add_attribute(colorRend, 'cell-background', COL_COLOR);
-        colorCol.add_attribute(colorRend, 'sensitive', COL_CHANGE_COLOR);
-        treeview.append_column(colorCol);
-
-        treeview.append_column(this._buildToggleColumn(_("Bold"), COL_BOLD, model));
-        treeview.append_column(this._buildToggleColumn(_("Italic"), COL_ITALIC, model));
-
-        model.set_sort_column_id(COL_PRIORITY, Gtk.SortType.ASCENDING);
-        scroller.add(treeview);
-        this.box.add(scroller);
-
-        const toolbar = new Gtk.Toolbar();
-        toolbar.get_style_context().add_class(Gtk.STYLE_CLASS_INLINE_TOOLBAR);
-
-        const addButton = new Gtk.ToolButton({
-            icon_name: Gtk.STOCK_ADD,
-            label: _("Add style"),
-            is_important: true
-        });
-        toolbar.add(addButton);
+        toolbar.append(addButton);
         addButton.connect('clicked', () => {
             const dialog = new Gtk.MessageDialog({
                 buttons: Gtk.ButtonsType.OK_CANCEL,
@@ -284,36 +368,38 @@ var PriorityMarkupWidget = GObject.registerClass({
             });
             const dialogbox = dialog.get_content_area();
             const userentry = new Gtk.Entry();
-            const PADDING = 0;
-            dialogbox.pack_end(userentry, false, false, PADDING);
-            dialog.show_all();
-            const response = dialog.run();
-            const priority = userentry.get_text();
-            if ((response == Gtk.ResponseType.OK) && (priority !== '')) {
-                const NEW_ROW_POSITIION = 10;
-                const newRow = model.insert(NEW_ROW_POSITIION);
-                model.set(newRow, [COL_PRIORITY, COL_CHANGE_COLOR, COL_COLOR, COL_BOLD,
-                    COL_ITALIC], [
-                    priority, false, 'rgb(255,255,255)', false, false]);
-                if (!this._validateModel(model)) {
-                    model.remove(newRow);
+            dialogbox.append(userentry);
+            dialog.connect('response', (dialog, response) => {
+                const priority = userentry.get_text();
+                if ((response == Gtk.ResponseType.OK) && (priority !== '')) {
+                    if (this._validateModel(priority)) {
+                        const item = new PriorityMarkupSetting();
+                        item.priority = priority;
+                        item.changeColor = false;
+                        item.color = 'rgb(255,255,255)';
+                        item.bold = false;
+                        item.italic = false;
+                        this.model.append(item);
+                    }
                 }
-            }
-            dialog.destroy();
+                dialog.destroy();
+            });
+            dialog.show();
         });
-        const deleteButton = new Gtk.ToolButton({
-            stock_id: Gtk.STOCK_DELETE,
+        const deleteButton = new Gtk.Button({
+            icon_name: 'edit-delete',
             label: _("Delete")
         });
-        toolbar.add(deleteButton);
+        toolbar.append(deleteButton);
         deleteButton.connect('clicked', () => {
-            const [success, model, iter] = treeview.get_selection().get_selected();
-            this._removePriorityStyle(model.get_value(iter, COL_PRIORITY));
-            if (success) {
-                model.remove(iter);
+            const selected = this.selectionModel.get_selected();
+            if (selected === Gtk.INVALID_LIST_POSITION) {
+                return;
             }
+            this._removePriorityStyle(this.model.get_item(selected).priority);
+            this.model.remove(selected);
         });
-        this.box.add(toolbar);
+        this.box.append(toolbar);
     }
 });
 

@@ -1,10 +1,10 @@
-var PACKAGE_VERSION = 43;
+var PACKAGE_VERSION = 46;
 var PACKAGE_URL = 'https://github.com/andyholmes/gnome-shell-extension-gsconnect';
 var PACKAGE_BUGREPORT = 'https://github.com/andyholmes/gnome-shell-extension-gsconnect/issues/new';
 var PACKAGE_DATADIR = '/usr/local/share/gnome-shell/extensions/gsconnect@andyholmes.github.io';
 var PACKAGE_LOCALEDIR = '/usr/local/share/locale';
 var GSETTINGS_SCHEMA_DIR = '/usr/local/share/glib-2.0/schemas';
-var GNOME_SHELL_LIBDIR = '/usr/lib64/';
+var GNOME_SHELL_LIBDIR = '/usr/local/lib';
 
 var APP_ID = 'org.gnome.Shell.Extensions.GSConnect';
 var APP_PATH = '/org/gnome/Shell/Extensions/GSConnect';

@@ -1,0 +1,11 @@
+.runcat-menu__icon {
+    padding: 0;
+    icon-size: 26px;
+}
+
+.runcat-menu__label {
+    width: 3em;
+    padding-left: 5px;
+
+    font-size: 12px;
+}

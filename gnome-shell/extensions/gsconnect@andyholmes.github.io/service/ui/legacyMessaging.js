@@ -16,14 +16,14 @@ var Dialog = GObject.registerClass({
             'device',
             'Device',
             'The device associated with this window',
-            GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY,
+            GObject.ParamFlags.READWRITE,
             GObject.Object
         ),
         'plugin': GObject.ParamSpec.object(
             'plugin',
             'Plugin',
             'The plugin providing messages',
-            GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY,
+            GObject.ParamFlags.READWRITE,
             GObject.Object
         ),
     },
@@ -186,7 +186,7 @@ var Dialog = GObject.registerClass({
 
     _onActivateLink(label, uri) {
         Gtk.show_uri_on_window(
-            this.get_toplevel(),
+            this.get_root(),
             uri.includes('://') ? uri : `https://${uri}`,
             Gtk.get_current_event_time()
         );
@@ -195,7 +195,7 @@ var Dialog = GObject.registerClass({
     }
 
     _onNumberSelected(chooser, number) {
-        let contacts = chooser.getSelected();
+        const contacts = chooser.getSelected();
 
         this.addresses = Object.keys(contacts).map(address => {
             return {address: address};

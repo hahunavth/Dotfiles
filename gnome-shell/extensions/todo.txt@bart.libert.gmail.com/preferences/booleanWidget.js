@@ -22,7 +22,7 @@ class BooleanWidget extends Extension.imports.preferences.preferenceWidget.Prefe
             settings.set(setting, object.active);
         });
 
-        this.box.add(settingsSwitch);
+        this.box.append(settingsSwitch);
     }
 });
 

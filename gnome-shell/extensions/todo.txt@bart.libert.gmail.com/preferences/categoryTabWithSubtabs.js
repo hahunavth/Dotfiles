@@ -45,6 +45,11 @@ var CategoryTabWithSubtabs = GObject.registerClass({
         this.append_page(element, element.getTitle());
         this._updateVisibility();
     }
+
+    remove(element) {
+        this.remove_page(this.page_num(element));
+        this._updateVisibility();
+    }
 });
 
 /* vi: set expandtab tabstop=4 shiftwidth=4: */

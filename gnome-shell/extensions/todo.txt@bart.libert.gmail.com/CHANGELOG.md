@@ -1,5 +1,11 @@
 # Changelog
 
+# v34
+
+* Port preferences to GTK4.0 (for Gnome 40 compatibility).
+  This could use some more love, but it's functional (I hope).
+* Add some instructions to shortcut widget
+
 ## v33
 *  Gnome 3.38 compatibility done by Adam Schmalhofer.
 

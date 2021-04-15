@@ -30,7 +30,7 @@ var SpinWidget = GObject.registerClass({
         });
 
         this._addHelp(spinButton);
-        this.box.add(spinButton);
+        this.box.append(spinButton);
     }
 });
 

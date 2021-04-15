@@ -17,21 +17,21 @@ var ReplyDialog = GObject.registerClass({
             'device',
             'Device',
             'The device associated with this window',
-            GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY,
+            GObject.ParamFlags.READWRITE,
             GObject.Object
         ),
         'plugin': GObject.ParamSpec.object(
             'plugin',
             'Plugin',
             'The plugin that owns this notification',
-            GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY,
+            GObject.ParamFlags.READWRITE,
             GObject.Object
         ),
         'uuid': GObject.ParamSpec.string(
             'uuid',
             'UUID',
             'The notification reply UUID',
-            GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY,
+            GObject.ParamFlags.READWRITE,
             null
         ),
     },
@@ -59,7 +59,7 @@ var ReplyDialog = GObject.registerClass({
         );
 
         // Notification Data
-        let headerbar = this.get_titlebar();
+        const headerbar = this.get_titlebar();
         headerbar.title = params.notification.appName;
         headerbar.subtitle = this.device.name;
 
@@ -156,7 +156,7 @@ var ReplyDialog = GObject.registerClass({
 
     _onActivateLink(label, uri) {
         Gtk.show_uri_on_window(
-            this.get_toplevel(),
+            this.get_root(),
             uri.includes('://') ? uri : `https://${uri}`,
             Gtk.get_current_event_time()
         );

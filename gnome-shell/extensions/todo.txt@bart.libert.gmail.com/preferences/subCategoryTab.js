@@ -6,8 +6,6 @@ const Utils = Extension.imports.utils;
 
 const _ = imports.gettext.domain('todotxt').gettext;
 
-const PADDING = 0;
-
 /* exported SubCategoryTab */
 var SubCategoryTab = GObject.registerClass({
     GTypeName: 'SubCategoryTab'
@@ -25,10 +23,9 @@ var SubCategoryTab = GObject.registerClass({
         this.orientation = Gtk.Orientation.VERTICAL;
         this.vbox = new Gtk.Box({
             orientation: Gtk.Orientation.VERTICAL,
-            border_width: 10,
             vexpand: true,
         });
-        Gtk.Box.prototype.add.call(this, this.vbox);
+        Gtk.Box.prototype.append.call(this, this.vbox);
         this._helpWidgets = [];
     }
 
@@ -50,8 +47,11 @@ var SubCategoryTab = GObject.registerClass({
             label: _("Help"),
         });
 
-        this._buttonBox = new Gtk.HButtonBox({
-            layout_style: Gtk.ButtonBoxStyle.END
+        this._buttonBox = new Gtk.Box({
+            orientation: Gtk.Orientation.HORIZONTAL,
+            halign: Gtk.Align.END,
+            vexpand: true,
+            valign: Gtk.Align.END
         });
 
         helpButton.connect('clicked', (ignored_object) => {
@@ -60,20 +60,23 @@ var SubCategoryTab = GObject.registerClass({
                 text: _(this._getHelpText()),
                 message_type: Gtk.MessageType.INFO
             });
-            dialog.run();
-            dialog.destroy();
+            dialog.connect('response', (dialog, ignored_response_id) => {
+                dialog.destroy();
+            });
+            dialog.show();
         });
-        this._buttonBox.add(helpButton);
-        this.vbox.pack_end(this._buttonBox, false, false, PADDING);
+        this._buttonBox.append(helpButton);
+        this.vbox.append(this._buttonBox);
     }
 
     _updateVisibility() {
         this._visible = false;
-        for (const child in this.vbox.get_children()) {
-            if (Object.prototype.hasOwnProperty.call(this.vbox.get_children(),child)) {
-                if (Utils.isValid(this.vbox.get_children()[child].isVisible)) {
-                    this._visible = this._visible || this.vbox.get_children()[child].isVisible();
-                }
+        let child = this.vbox.get_first_child();
+        while (Utils.isValid(child)) {
+            try {
+                this._visible = this._visible || child.isVisible();
+            } finally {
+                child = child.get_next_sibling();
             }
         }
         let buttonBoxVisible = false;
@@ -109,7 +112,7 @@ var SubCategoryTab = GObject.registerClass({
             return;
         }
 
-        this.vbox.add(child);
+        child.insert_before(this.vbox, this._buttonBox);
         this._updateVisibility();
     }
 

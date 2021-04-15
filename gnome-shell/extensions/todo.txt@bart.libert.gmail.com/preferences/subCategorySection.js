@@ -24,17 +24,18 @@ var SubCategorySection = GObject.registerClass({
             orientation: Gtk.Orientation.VERTICAL,
             margin_start: 20,
         });
-        Gtk.Box.prototype.add.call(this, this.label);
-        Gtk.Box.prototype.add.call(this, this.vbox);
+        Gtk.Box.prototype.append.call(this, this.label);
+        Gtk.Box.prototype.append.call(this, this.vbox);
     }
 
     _updateVisibility() {
         this._visible = false;
-        for (const child in this.vbox.get_children()) {
-            if (Object.prototype.hasOwnProperty.call(this.vbox.get_children(),child)) {
-                if (Utils.isValid(this.vbox.get_children()[child].isVisible)) {
-                    this._visible = this._visible || this.vbox.get_children()[child].isVisible();
-                }
+        let child = this.vbox.get_first_child();
+        while (Utils.isValid(child)) {
+            try {
+                this._visible = this._visible || child.isVisible();
+            } finally {
+                child = child.get_next_sibling();
             }
         }
     }
@@ -48,7 +49,7 @@ var SubCategorySection = GObject.registerClass({
         if (child === null) {
             return;
         }
-        this.vbox.add(child);
+        this.vbox.append(child);
         this._updateVisibility();
     }
 

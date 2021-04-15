@@ -13,7 +13,6 @@ var CategoryTab = GObject.registerClass({
         super._init();
         this._visible = false;
         this.orientation = Gtk.Orientation.VERTICAL;
-        this.border_width = 10;
         this.vexpand = true;
         this.spacing = 6;
 
@@ -26,11 +25,12 @@ var CategoryTab = GObject.registerClass({
 
     _updateVisibility() {
         this._visible = false;
-        for (const child in this.get_children()) {
-            if (Object.prototype.hasOwnProperty.call(this.get_children(),child)) {
-                if (Utils.isValid(this.get_children()[child].isVisible)) {
-                    this._visible = this._visible || this.get_children()[child].isVisible();
-                }
+        let child = this.get_first_child();
+        while (Utils.isValid(child)) {
+            try {
+                this._visible = this._visible || child.isVisible();
+            } finally {
+                child = child.get_next_sibling();
             }
         }
     }
@@ -45,7 +45,7 @@ var CategoryTab = GObject.registerClass({
     }
 
     add(child) {
-        super.add(child);
+        super.append(child);
         this._updateVisibility();
     }
 });

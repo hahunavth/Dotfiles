@@ -1,0 +1,102 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the Ibus Tweaker package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Ibus Tweaker 29\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2021-03-27 14:27+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: prefs.js:48
+msgid "Red"
+msgstr ""
+
+#: prefs.js:48
+msgid "Green"
+msgstr ""
+
+#: prefs.js:48
+msgid "Orange"
+msgstr ""
+
+#: prefs.js:48
+msgid "Blue"
+msgstr ""
+
+#: prefs.js:48
+msgid "Purple"
+msgstr ""
+
+#: prefs.js:48
+msgid "Turquoise"
+msgstr ""
+
+#: prefs.js:48
+msgid "Grey"
+msgstr ""
+
+#: prefs.js:58
+msgid "Run dialog"
+msgstr ""
+
+#: prefs.js:59
+msgid "MS IME theme"
+msgstr ""
+
+#: prefs.js:60
+msgid "Hide Activities"
+msgstr ""
+
+#: prefs.js:61
+msgid "Use custom font"
+msgstr ""
+
+#: prefs.js:63
+msgid "Auto switch ASCII mode"
+msgstr ""
+
+#: prefs.js:64
+msgid "Candidates orientation"
+msgstr ""
+
+#: prefs.js:65
+msgid "Vertical"
+msgstr ""
+
+#: prefs.js:65
+msgid "Horizontal"
+msgstr ""
+
+#: prefs.js:66
+msgid "On"
+msgstr ""
+
+#: prefs.js:66
+msgid "Off"
+msgstr ""
+
+#: prefs.js:66
+msgid "Default"
+msgstr ""
+
+#: prefs.js:67
+msgid "Auto"
+msgstr ""
+
+#: prefs.js:67
+msgid "Light"
+msgstr ""
+
+#: prefs.js:67
+msgid "Dark"
+msgstr ""

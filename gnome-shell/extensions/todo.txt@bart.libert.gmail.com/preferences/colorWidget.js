@@ -27,7 +27,7 @@ var ColorWidget = GObject.registerClass({
 
         this._addHelp(customColorButton);
 
-        this.box.add(customColorButton);
+        this.box.append(customColorButton);
     }
 });
 

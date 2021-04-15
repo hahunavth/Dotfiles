@@ -4,9 +4,10 @@
   "name": "Workspaces Bar",
   "shell-version": [
     "3.36",
-    "3.38"
+    "3.38",
+    "40"
   ],
   "url": "https://github.com/fthx/workspaces-bar",
   "uuid": "workspaces-bar@fthx",
-  "version": 6
+  "version": 7
 }

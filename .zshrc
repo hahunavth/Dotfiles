@@ -191,3 +191,19 @@ POWERLEVEL9K_NODE_ICON='%fvia %F{green}⬢'
 
 ############ END- POWERLEVEL THEME SETTINGS ##############
 
+export NVM_DIR=~/.nvm
+ [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+ [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  
+# This loads nvm bash_completion
+
+
+export PATH="$PATH:`yarn global bin`"
+
+
+
+
+
+XMAS=`date -d "Jun 1" +%j`
+TODAY=`date +%j`
+DAYS=$(($XMAS - $TODAY))
+echo "You have: " + $DAYS + " days."

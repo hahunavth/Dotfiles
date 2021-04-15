@@ -30,18 +30,20 @@ var PreferenceWidget = GObject.registerClass({
             }
         }, settings.getExtraParams(settingName));
 
+        const MARGIN = 5;
         this.box = new Gtk.Box({
             orientation: Gtk.Orientation.HORIZONTAL,
-            margin: 3
+            margin_top: MARGIN,
+            margin_bottom: MARGIN,
+            margin_start: MARGIN,
+            margin_end: MARGIN
         });
-
-        const PADDING = 0;
 
         this.revealer = new Gtk.Revealer();
         this.revealer.set_reveal_child(this.isVisible());
-        this.revealer.add(this.box);
+        this.revealer.set_child(this.box);
 
-        this.pack_start(this.revealer, true, true, PADDING);
+        this.prepend(this.revealer);
         this._registerLevel();
         this._registerSensitivity(this._params.sensitivity, () => {
             this._updateRevealerVisibility();
@@ -52,7 +54,7 @@ var PreferenceWidget = GObject.registerClass({
             return;
         }
 
-        this.box.pack_start(this._getLabel(), true, true, PADDING);
+        this.box.prepend(this._getLabel());
     }
 
     _isSensitive(sensitivityArray) {
@@ -144,13 +146,13 @@ var PreferenceWidget = GObject.registerClass({
     _getLabel() {
         const preferenceLabel = new Gtk.Label({
             label: _(this._settings.getHumanName(this._settingName)),
-            xalign: 0
+            xalign: 0,
+            hexpand: true
         });
 
         this._addHelp(preferenceLabel);
         return preferenceLabel;
     }
-
 });
 Signals.addSignalMethods(PreferenceWidget.prototype);
 

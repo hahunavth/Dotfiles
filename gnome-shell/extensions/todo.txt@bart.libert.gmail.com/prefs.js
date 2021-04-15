@@ -75,6 +75,7 @@ var Prefs = class {
         for (const section in this.shownSections) {
             if (Object.prototype.hasOwnProperty.call(this.shownSections,section)) {
                 if (this.shownSections[section][SECTION].isVisible() === false) {
+                    log(`FOO: ${this.shownSections[section][SECTION]}`);
                     this.shownSections[section][PAGE].remove(this.shownSections[section][SECTION]);
                     updated = true;
                     removeMe.push(this.shownSections[section]);
@@ -106,13 +107,10 @@ var Prefs = class {
 
 
     _visibilityHasChanged() {
-        let updated = this._showHiddenSectionsIfApplicable();
-        updated = updated || this._hideSectionsIfApplicable();
-        updated = updated || this._showHiddenCategoriesIfApplicable();
-        updated = updated || this._hideCategoriesIfApplicable();
-        if (updated) {
-            this.frame.show_all();
-        }
+        this._showHiddenSectionsIfApplicable();
+        this._hideSectionsIfApplicable();
+        this._showHiddenCategoriesIfApplicable();
+        this._hideCategoriesIfApplicable();
     }
 
     buildSubCategorySection(category, subcategory) {
@@ -163,13 +161,10 @@ var Prefs = class {
             }
         }
         this.frame = new Gtk.Box({
-            orientation: Gtk.Orientation.VERTICAL,
-            border_width: 10,
+            orientation: Gtk.Orientation.VERTICAL
         });
 
-        this.frame.add(this.notebook);
-
-        this.frame.show_all();
+        this.frame.append(this.notebook);
 
         return this.frame;
     }

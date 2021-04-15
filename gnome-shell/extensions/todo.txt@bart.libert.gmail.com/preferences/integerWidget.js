@@ -59,7 +59,7 @@ var IntegerWidget = GObject.registerClass({
         });
 
         this._addHelp(comboBox);
-        this.box.add(comboBox);
+        this.box.append(comboBox);
     }
 });
 
