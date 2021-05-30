@@ -1,0 +1,113 @@
+/**** some globals ****/
+
+.taskwhisperer-extension .p05 {
+    padding: 0 5px;
+}
+
+.taskwhisperer-extension .text-s {
+    font-size: .8em;
+}
+
+.taskwhisperer-extension .fwb {
+    font-weight: bold;
+}
+
+.taskwhisperer-extension .tac {
+    text-align: center;
+}
+
+.taskwhisperer-extension .tar {
+    text-align: right;
+}
+
+.button-group .button {
+    margin: 0 5px;
+}
+
+.button-group .button.selected {
+    text-decoration: underline;
+    font-family: "Inter", sans-serif;
+    font-weight: 500;
+}
+
+/*** main components ***/
+
+.taskwhisperer-extension .menu-item .menu-icon {
+    height: 16px;
+    width: 16px;
+    margin: 0 5px;
+}
+
+.taskwhisperer-extension .menu-item .menu-label {
+    margin: 0 5px;
+}
+
+.taskwhisperer-extension .screen,
+.taskwhisperer-extension .screen-wrapper {
+    width: 550px;
+    max-width: 550px;
+    height: 630px;
+    max-height: 630px;
+}
+
+.taskwhisperer-extension .search-bar {
+    height: 40px;
+    padding: 5px 10px;
+}
+
+.taskwhisperer-extension .search-bar .search-area-box .navigate-back-icon-button {
+    margin-right: 15px;
+    padding: 5px;
+}
+
+.taskwhisperer-extension .search-bar .search-area-box .search-text-input .search-entry-icon {
+    width: 21px;
+    height: 21px;
+}
+
+.taskwhisperer-extension .search-bar .button-box {
+    height: 20px;
+    margin-left: 15px;
+}
+
+.taskwhisperer-extension .search-bar .button-box .icon-button {
+    margin: 0 2px;
+    padding: 5px;
+}
+
+/********** Cards ******************/
+
+.taskwhisperer-extension .card {
+    margin: 5px 15px;
+    padding: 5px 15px;
+    box-shadow: none;
+}
+
+.taskwhisperer-extension .task-card .status-icon-bin {
+    width: 20px;
+}
+
+.taskwhisperer-extension .task-card .description-box {
+    margin: 0 10px;
+}
+
+.taskwhisperer-extension .task-card .quick-action {
+    margin: 0;
+    padding: 0 5px;
+}
+
+/********** Task Overview Screen ******************/
+.taskwhisperer-extension .task-overview-header-box {
+    padding: 5px;
+}
+
+.taskwhisperer-extension .task-overview-header-box .button {
+    font-size: 0.7em;
+    margin: 1px !important;
+    padding: 0 5px !important;
+}
+
+/********** Task Form Screen ******************/
+.taskwhisperer-extension .edit-task-screen .form-element-box {
+    margin: 10px 15px;
+}

@@ -6,9 +6,9 @@
 # For explanations of all config options below see docs/USAGE.md or the man page.
 #
  sync_dir = "~/OneDrive"
- skip_file = "*.tmp|*.aux|*.log|*.synctex.gz|*.bbl|*.dvi|*.blg|*.fdb_latexmk|*.ps|*.out|CMakeCache.txt|.ninja_deps|.ninja_log|cmake_install.cmake|*.toc|*.bib|*.class|*.ctxt|*.out|Makefile|npm-debug.log*|yarn-debug.log*|yarn-error.log*|lerna-debug.log*|.npm|.git"
+ skip_file = "*.tmp|*.aux|*.log|*.synctex.gz|*.bbl|*.dvi|*.blg|*.fdb_latexmk|*.ps|*.out|CMakeCache.txt|.ninja_deps|.ninja_log|cmake_install.cmake|*.toc|*.bib|*.class|*.ctxt|*.out|Makefile|npm-debug.log*|yarn-debug.log*|yarn-error.log*|lerna-debug.log*|*.npm|*.git"
 # monitor_interval = "300"
- skip_dir = "node_modules|CMakeFiles"
+ skip_dir = "node_modules|CMakeFiles|.git|20191|20192|20193-No"
  log_dir = "/var/log/onedrive/"
 # drive_id = ""
 # upload_only = "false"

@@ -1,6 +1,138 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
   <requires lib="gtk" version="4.0"/>
+  <object class="GtkListStore" id="animation_mode_list">
+    <columns>
+      <column type="gchararray"/>
+      <column type="gchararray"/>
+    </columns>
+    <data>
+      <row>
+        <col id="0" translatable="yes">Linear tweening</col>
+        <col id="1">linear</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">Quadratic tweening</col>
+        <col id="1">ease-in-quad</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">Quadratic tweening, inverse</col>
+        <col id="1">ease-out-quad</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">Quadratic tweening, combining direct and inverse</col>
+        <col id="1">ease-in-out-quad</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">Cubic tweening</col>
+        <col id="1">ease-in-cubic</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">Cubic tweening, inverse</col>
+        <col id="1">ease-out-cubic</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">Cubic tweening, combining direct and inverse</col>
+        <col id="1">ease-in-out-cubic</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">Quartic tweening</col>
+        <col id="1">ease-in-quart</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">Quartic tweening, inverse</col>
+        <col id="1">ease-out-quart</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">Quartic tweening, combining direct and inverse</col>
+        <col id="1">ease-in-out-quart</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">Quintic tweening</col>
+        <col id="1">ease-in-quint</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">Quintic tweening, inverse</col>
+        <col id="1">ease-out-quint</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">Quintic tweening, combining direct and inverse</col>
+        <col id="1">ease-in-out-quint</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">Sinusoidal tweening</col>
+        <col id="1">ease-in-sine</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">Sinusoidal tweening, inverse</col>
+        <col id="1">ease-out-sine</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">Sinusoidal tweening, combining direct and inverse</col>
+        <col id="1">ease-in-out-sine</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">Exponential tweening</col>
+        <col id="1">ease-in-expo</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">Exponential tweening, inverse</col>
+        <col id="1">ease-out-expo</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">Exponential tweening, combining direct and inverse</col>
+        <col id="1">ease-in-out-expo</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">Circular tweening</col>
+        <col id="1">ease-in-circ</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">Circular tweening, inverse</col>
+        <col id="1">ease-out-circ</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">Circular tweening, combining direct and inverse</col>
+        <col id="1">ease-in-out-circ</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">Elastic tweening, with offshoot on start</col>
+        <col id="1">ease-in-elastic</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">Elastic tweening, with offshoot on end</col>
+        <col id="1">ease-out-elastic</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">Elastic tweening with offshoot on both ends</col>
+        <col id="1">ease-in-out-elastic</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">Overshooting cubic tweening, with backtracking on start</col>
+        <col id="1">ease-in-back</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">Overshooting cubic tweening, with backtracking on end</col>
+        <col id="1">ease-out-back</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">Overshooting cubic tweening, with backtracking on both ends</col>
+        <col id="1">ease-in-out-back</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">Exponentially decaying parabolic (bounce) tweening, with bounce on start</col>
+        <col id="1">ease-in-bounce</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">Exponentially decaying parabolic (bounce) tweening, with bounce on end</col>
+        <col id="1">ease-out-bounce</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">Exponentially decaying parabolic (bounce) tweening, with bounce on both ends</col>
+        <col id="1">ease-in-out-bounce</col>
+      </row>
+    </data>
+  </object>
   <object class="GtkListStore" id="color_scheme_list">
     <columns>
       <column type="gchararray"/>
@@ -95,6 +227,28 @@
       <row>
         <col id="0" translatable="yes">TTY Erase</col>
         <col id="1">tty</col>
+      </row>
+    </data>
+  </object>
+  <object class="GtkListStore" id="global_shortcuts_list">
+    <columns>
+      <column type="gchararray"/>
+      <column type="gchararray"/>
+      <column type="guint"/>
+      <column type="guint"/>
+    </columns>
+    <data>
+      <row>
+        <col id="0">ddterm-toggle-hotkey</col>
+        <col id="1" translatable="yes">Toggle Terminal Window</col>
+        <col id="2">0</col>
+        <col id="3">0</col>
+      </row>
+      <row>
+        <col id="0">ddterm-activate-hotkey</col>
+        <col id="1" translatable="yes">Show/Activate Terminal Window</col>
+        <col id="2">0</col>
+        <col id="3">0</col>
       </row>
     </data>
   </object>
@@ -273,14 +427,14 @@
     </columns>
     <data>
       <row>
-        <col id="0">ddterm-toggle-hotkey</col>
-        <col id="1" translatable="yes">Toggle Terminal Window</col>
+        <col id="0">shortcut-window-hide</col>
+        <col id="1" translatable="yes">Hide the Window</col>
         <col id="2">0</col>
         <col id="3">0</col>
       </row>
       <row>
-        <col id="0">shortcut-window-hide</col>
-        <col id="1" translatable="yes">Hide the Window</col>
+        <col id="0">shortcut-toggle-maximize</col>
+        <col id="1" translatable="yes">Maximize/Unmaximize the Window</col>
         <col id="2">0</col>
         <col id="3">0</col>
       </row>
@@ -440,7 +594,7 @@
   <object class="GtkTextBuffer" id="tab_title_template_buffer">
     <property name="tag-table">tab_title_tag_table</property>
   </object>
-  <object class="GtkAdjustment" id="window_height_adjustment">
+  <object class="GtkAdjustment" id="window_size_adjustment">
     <property name="upper">1</property>
     <property name="step-increment">0.01</property>
     <property name="page-increment">0.10</property>
@@ -498,7 +652,7 @@
                     <property name="use-underline">1</property>
                     <layout>
                       <property name="column">0</property>
-                      <property name="row">4</property>
+                      <property name="row">5</property>
                       <property name="column-span">2</property>
                     </layout>
                   </object>
@@ -510,7 +664,7 @@
                     <property name="use-underline">1</property>
                     <layout>
                       <property name="column">0</property>
-                      <property name="row">5</property>
+                      <property name="row">6</property>
                       <property name="column-span">2</property>
                     </layout>
                   </object>
@@ -548,7 +702,7 @@
                     <property name="use-underline">1</property>
                     <layout>
                       <property name="column">0</property>
-                      <property name="row">8</property>
+                      <property name="row">9</property>
                       <property name="column-span">2</property>
                     </layout>
                   </object>
@@ -560,7 +714,7 @@
                     <property name="use-underline">1</property>
                     <layout>
                       <property name="column">0</property>
-                      <property name="row">6</property>
+                      <property name="row">7</property>
                       <property name="column-span">2</property>
                     </layout>
                   </object>
@@ -572,7 +726,7 @@
                     <property name="use-underline">1</property>
                     <layout>
                       <property name="column">0</property>
-                      <property name="row">7</property>
+                      <property name="row">8</property>
                       <property name="column-span">2</property>
                     </layout>
                   </object>
@@ -584,19 +738,20 @@
                     <property name="use-underline">1</property>
                     <layout>
                       <property name="column">0</property>
-                      <property name="row">9</property>
+                      <property name="row">13</property>
                       <property name="column-span">2</property>
                     </layout>
                   </object>
                 </child>
                 <child>
                   <object class="GtkCheckButton" id="force_gdk_x11_check">
-                    <property name="label" translatable="yes">Force _X11 GDK backend (XWayland)</property>
+                    <property name="label" translatable="yes">Force _X11 GDK backend (XWayland).
+You&apos;ll have to close all tabs for this option to take effect.</property>
                     <property name="action-name">settings.force-x11-gdk-backend</property>
                     <property name="use-underline">1</property>
                     <layout>
                       <property name="column">0</property>
-                      <property name="row">10</property>
+                      <property name="row">14</property>
                       <property name="column-span">2</property>
                     </layout>
                   </object>
@@ -609,7 +764,7 @@
                     <property name="mnemonic-widget">window_type_hint_combo</property>
                     <layout>
                       <property name="column">0</property>
-                      <property name="row">11</property>
+                      <property name="row">15</property>
                     </layout>
                   </object>
                 </child>
@@ -631,32 +786,32 @@
                     </items>
                     <layout>
                       <property name="column">1</property>
-                      <property name="row">11</property>
+                      <property name="row">15</property>
                     </layout>
                   </object>
                 </child>
                 <child>
                   <object class="GtkLabel">
                     <property name="halign">start</property>
-                    <property name="label" translatable="yes">_Height:</property>
+                    <property name="label" translatable="yes">Window _size:</property>
                     <property name="use-underline">1</property>
-                    <property name="mnemonic-widget">window_height_scale</property>
+                    <property name="mnemonic-widget">window_size_scale</property>
                     <layout>
                       <property name="column">0</property>
-                      <property name="row">2</property>
+                      <property name="row">3</property>
                     </layout>
                   </object>
                 </child>
                 <child>
-                  <object class="GtkScale" id="window_height_scale">
+                  <object class="GtkScale" id="window_size_scale">
                     <property name="draw-value">1</property>
-                    <property name="adjustment">window_height_adjustment</property>
+                    <property name="adjustment">window_size_adjustment</property>
                     <property name="show-fill-level">1</property>
                     <property name="round-digits">2</property>
                     <property name="digits">2</property>
                     <layout>
                       <property name="column">1</property>
-                      <property name="row">2</property>
+                      <property name="row">3</property>
                     </layout>
                   </object>
                 </child>
@@ -667,8 +822,105 @@
                     <property name="use-underline">1</property>
                     <layout>
                       <property name="column">0</property>
-                      <property name="row">3</property>
+                      <property name="row">4</property>
                       <property name="column-span">2</property>
+                    </layout>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkCheckButton">
+                    <property name="label" translatable="yes">Override default window animations</property>
+                    <property name="action-name">settings.override-window-animation</property>
+                    <layout>
+                      <property name="column">0</property>
+                      <property name="row">10</property>
+                      <property name="column-span">2</property>
+                    </layout>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkLabel">
+                    <property name="halign">start</property>
+                    <property name="label" translatable="yes">Show animation:</property>
+                    <layout>
+                      <property name="column">0</property>
+                      <property name="row">11</property>
+                    </layout>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkLabel">
+                    <property name="halign">start</property>
+                    <property name="label" translatable="yes">Hide animation:</property>
+                    <layout>
+                      <property name="column">0</property>
+                      <property name="row">12</property>
+                    </layout>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkBox">
+                    <property name="orientation">vertical</property>
+                    <child>
+                      <object class="GtkComboBox" id="show_animation_combo">
+                        <property name="model">animation_mode_list</property>
+                        <property name="id-column">1</property>
+                        <child>
+                          <object class="GtkCellRendererText"/>
+                          <attributes>
+                            <attribute name="text">0</attribute>
+                          </attributes>
+                        </child>
+                      </object>
+                    </child>
+                    <layout>
+                      <property name="column">1</property>
+                      <property name="row">11</property>
+                    </layout>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkBox">
+                    <property name="orientation">vertical</property>
+                    <child>
+                      <object class="GtkComboBox" id="hide_animation_combo">
+                        <property name="model">animation_mode_list</property>
+                        <property name="id-column">1</property>
+                        <child>
+                          <object class="GtkCellRendererText"/>
+                          <attributes>
+                            <attribute name="text">0</attribute>
+                          </attributes>
+                        </child>
+                      </object>
+                    </child>
+                    <layout>
+                      <property name="column">1</property>
+                      <property name="row">12</property>
+                    </layout>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkLabel">
+                    <property name="halign">start</property>
+                    <property name="label" translatable="yes">Window position:</property>
+                    <layout>
+                      <property name="column">0</property>
+                      <property name="row">2</property>
+                    </layout>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkComboBoxText" id="window_pos_combo">
+                    <items>
+                      <item id="top" translatable="yes">Top</item>
+                      <item id="bottom" translatable="yes">Bottom</item>
+                      <item id="left" translatable="yes">Left</item>
+                      <item id="right" translatable="yes">Right</item>
+                    </items>
+                    <layout>
+                      <property name="column">1</property>
+                      <property name="row">2</property>
                     </layout>
                   </object>
                 </child>
@@ -694,7 +946,7 @@
                     <property name="use-underline">1</property>
                     <layout>
                       <property name="column">0</property>
-                      <property name="row">1</property>
+                      <property name="row">2</property>
                       <property name="column-span">2</property>
                     </layout>
                   </object>
@@ -706,19 +958,19 @@
                     <property name="use-underline">1</property>
                     <layout>
                       <property name="column">0</property>
-                      <property name="row">2</property>
+                      <property name="row">3</property>
                       <property name="column-span">2</property>
                     </layout>
                   </object>
                 </child>
                 <child>
                   <object class="GtkCheckButton" id="show_new_tab_button_check">
-                    <property name="label" translatable="yes">&quot;_New Tab&quot; button</property>
+                    <property name="label" translatable="yes">&quot;_New Tab (Last)&quot; button</property>
                     <property name="action-name">settings.new-tab-button</property>
                     <property name="use-underline">1</property>
                     <layout>
                       <property name="column">0</property>
-                      <property name="row">3</property>
+                      <property name="row">5</property>
                       <property name="column-span">2</property>
                     </layout>
                   </object>
@@ -730,13 +982,14 @@
                     <property name="use-underline">1</property>
                     <layout>
                       <property name="column">0</property>
-                      <property name="row">5</property>
+                      <property name="row">6</property>
                       <property name="column-span">2</property>
                     </layout>
                   </object>
                 </child>
                 <child>
                   <object class="GtkLabel">
+                    <property name="halign">start</property>
                     <property name="label" translatable="yes">Show tab _bar:</property>
                     <property name="use-underline">1</property>
                     <property name="mnemonic-widget">tab_policy_combo</property>
@@ -767,7 +1020,7 @@
                     <property name="mnemonic-widget">tab_title_template_text_view</property>
                     <layout>
                       <property name="column">0</property>
-                      <property name="row">6</property>
+                      <property name="row">7</property>
                     </layout>
                   </object>
                 </child>
@@ -779,7 +1032,7 @@
                     <property name="monospace">1</property>
                     <layout>
                       <property name="column">1</property>
-                      <property name="row">6</property>
+                      <property name="row">7</property>
                     </layout>
                   </object>
                 </child>
@@ -815,7 +1068,7 @@ Following helpers are available:
                     </property>
                     <layout>
                       <property name="column">0</property>
-                      <property name="row">8</property>
+                      <property name="row">9</property>
                       <property name="column-span">2</property>
                     </layout>
                   </object>
@@ -827,19 +1080,43 @@ Following helpers are available:
                     <property name="use-underline">1</property>
                     <layout>
                       <property name="column">1</property>
-                      <property name="row">7</property>
+                      <property name="row">8</property>
                     </layout>
                   </object>
                 </child>
                 <child>
                   <object class="GtkCheckButton" id="show_new_tab_front_button_check">
-                    <property name="label" translatable="yes">&quot;_New Tab in Front&quot; button</property>
+                    <property name="label" translatable="yes">&quot;_New Tab (First)&quot; button</property>
                     <property name="action-name">settings.new-tab-front-button</property>
                     <property name="use-underline">1</property>
                     <layout>
                       <property name="column">0</property>
                       <property name="row">4</property>
                       <property name="column-span">2</property>
+                    </layout>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkLabel">
+                    <property name="halign">start</property>
+                    <property name="label" translatable="yes">Tab bar position:</property>
+                    <layout>
+                      <property name="column">0</property>
+                      <property name="row">1</property>
+                    </layout>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkComboBoxText" id="tab_position_combo">
+                    <items>
+                      <item id="bottom" translatable="yes">Bottom</item>
+                      <item id="top" translatable="yes">Top</item>
+                      <item id="left" translatable="yes">Left</item>
+                      <item id="right" translatable="yes">Right</item>
+                    </items>
+                    <layout>
+                      <property name="column">1</property>
+                      <property name="row">1</property>
                     </layout>
                   </object>
                 </child>
@@ -992,6 +1269,54 @@ Following helpers are available:
                     <layout>
                       <property name="column">0</property>
                       <property name="row">6</property>
+                      <property name="column-span">2</property>
+                    </layout>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkBox" id="detect_urls_container">
+                    <property name="margin-start">20</property>
+                    <property name="orientation">vertical</property>
+                    <property name="spacing">10</property>
+                    <child>
+                      <object class="GtkCheckButton">
+                        <property name="label" translatable="yes">Detect raw URLs (scheme://netloc/path)</property>
+                        <property name="action-name">settings.detect-urls-as-is</property>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkCheckButton">
+                        <property name="label" translatable="yes">Detect file: URLs</property>
+                        <property name="action-name">settings.detect-urls-file</property>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkCheckButton">
+                        <property name="label" translatable="yes">Detect HTTP URLs</property>
+                        <property name="action-name">settings.detect-urls-http</property>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkCheckButton">
+                        <property name="label" translatable="yes">Detect VoIP URLs</property>
+                        <property name="action-name">settings.detect-urls-voip</property>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkCheckButton">
+                        <property name="label" translatable="yes">Detect E-mail addresses</property>
+                        <property name="action-name">settings.detect-urls-email</property>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkCheckButton">
+                        <property name="label" translatable="yes">Detect news:/man: URLs</property>
+                        <property name="action-name">settings.detect-urls-news-man</property>
+                      </object>
+                    </child>
+                    <layout>
+                      <property name="column">0</property>
+                      <property name="row">7</property>
                       <property name="column-span">2</property>
                     </layout>
                   </object>
@@ -1525,6 +1850,17 @@ Following helpers are available:
                     </layout>
                   </object>
                 </child>
+                <child>
+                  <object class="GtkCheckButton">
+                    <property name="label" translatable="yes">Preserve working directory</property>
+                    <property name="action-name">settings.preserve-working-directory</property>
+                    <layout>
+                      <property name="column">0</property>
+                      <property name="row">3</property>
+                      <property name="column-span">2</property>
+                    </layout>
+                  </object>
+                </child>
               </object>
             </property>
           </object>
@@ -1730,8 +2066,48 @@ Following helpers are available:
                 <property name="orientation">vertical</property>
                 <property name="spacing">10</property>
                 <child>
+                  <object class="GtkScrolledWindow">
+                    <property name="child">
+                      <object class="GtkTreeView">
+                        <property name="model">global_shortcuts_list</property>
+                        <property name="search-column">0</property>
+                        <child internal-child="selection">
+                          <object class="GtkTreeSelection"/>
+                        </child>
+                        <child>
+                          <object class="GtkTreeViewColumn">
+                            <property name="resizable">1</property>
+                            <property name="title" translatable="yes">Global Action</property>
+                            <child>
+                              <object class="GtkCellRendererText"/>
+                              <attributes>
+                                <attribute name="text">1</attribute>
+                              </attributes>
+                            </child>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkTreeViewColumn">
+                            <property name="resizable">1</property>
+                            <property name="title" translatable="yes">Global Shortcut</property>
+                            <child>
+                              <object class="GtkCellRendererAccel" id="global_accel_renderer">
+                                <property name="editable">1</property>
+                              </object>
+                              <attributes>
+                                <attribute name="accel-key">2</attribute>
+                                <attribute name="accel-mods">3</attribute>
+                              </attributes>
+                            </child>
+                          </object>
+                        </child>
+                      </object>
+                    </property>
+                  </object>
+                </child>
+                <child>
                   <object class="GtkCheckButton" id="enable_shortcuts_check">
-                    <property name="label" translatable="yes">_Enable shortcuts</property>
+                    <property name="label" translatable="yes">_Enable application shortcuts</property>
                     <property name="action-name">settings.shortcuts-enabled</property>
                     <property name="use-underline">1</property>
                   </object>
@@ -1740,7 +2116,7 @@ Following helpers are available:
                   <object class="GtkScrolledWindow">
                     <property name="vexpand">1</property>
                     <property name="child">
-                      <object class="GtkTreeView">
+                      <object class="GtkTreeView" id="shortcuts_treeview">
                         <property name="model">shortcuts_list</property>
                         <child internal-child="selection">
                           <object class="GtkTreeSelection"/>
@@ -1774,6 +2150,44 @@ Following helpers are available:
                         </child>
                       </object>
                     </property>
+                  </object>
+                </child>
+              </object>
+            </property>
+          </object>
+        </child>
+        <child>
+          <object class="GtkStackPage">
+            <property name="title" translatable="yes">Panel Icon</property>
+            <property name="child">
+              <object class="GtkGrid">
+                <property name="margin-start">10</property>
+                <property name="margin-end">10</property>
+                <property name="margin-top">10</property>
+                <property name="margin-bottom">10</property>
+                <property name="row-spacing">10</property>
+                <property name="column-spacing">10</property>
+                <child>
+                  <object class="GtkLabel">
+                    <property name="halign">start</property>
+                    <property name="label" translatable="yes">Panel icon:</property>
+                    <layout>
+                      <property name="column">0</property>
+                      <property name="row">0</property>
+                    </layout>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkComboBoxText" id="panel_icon_type_combo">
+                    <items>
+                      <item id="none" translatable="yes">None</item>
+                      <item id="menu-button" translatable="yes">With Popup Menu</item>
+                      <item id="toggle-button" translatable="yes">Toggle Button</item>
+                    </items>
+                    <layout>
+                      <property name="column">1</property>
+                      <property name="row">0</property>
+                    </layout>
                   </object>
                 </child>
               </object>

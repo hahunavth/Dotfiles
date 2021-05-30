@@ -18,6 +18,7 @@ const Fields = Me.imports.fields.Fields;
 const NOTIFY = { MSG: 0, OSD: 1 };
 const MENU = { HISTORY: 0, COLLECT: 1 };
 const NOTATION = { HEX: 0, RGB: 1, HSL: 2 };
+const COLOR_PICK_ICON = Me.dir.get_child('icons').get_child('color-pick.svg').get_path();
 const DROPPER_ICON = Me.dir.get_child('icons').get_child('dropper-symbolic.svg').get_path();
 
 const convToCSS = (color, notation) => {
@@ -47,6 +48,7 @@ const convToHex = color => {
 const convToText = color => {
     let hex = convToHex(color);
     let [h, l, s] = Clutter.Color.from_string(hex)[1].to_hls();
+    //NOTE: https://gitlab.gnome.org/GNOME/mutter/-/issues/1324
     return ' <span fgcolor="%s" bgcolor="%s">%s</span>'.format(Math.round(l) ? '#000' : '#fff', hex, color);
 }
 
@@ -314,7 +316,8 @@ const ColorArea = GObject.registerClass({
             });
 
             this._icon = new St.Icon({
-                icon_name: 'color-pick',
+                // icon_name: 'color-pick',
+                gicon: new Gio.FileIcon({ file: Gio.File.new_for_path(COLOR_PICK_ICON) }),
                 icon_size: Meta.prefs_get_cursor_size() * 1.5,
                 effect: this._effect,
                 visible: false,
@@ -432,14 +435,15 @@ const ColorPicker = GObject.registerClass({
     Properties: {
         'collect':       GObject.ParamSpec.string('collect', 'collect', 'collect', GObject.ParamFlags.WRITABLE, ''),
         'history':       GObject.ParamSpec.string('history', 'history', 'history', GObject.ParamFlags.WRITABLE, ''),
-        'systray':       GObject.ParamSpec.boolean('systray', 'systray', 'systray', GObject.ParamFlags.WRITABLE, false),
-        'preview':       GObject.ParamSpec.boolean('preview', 'preview', 'preview', GObject.ParamFlags.READWRITE, false),
+        'systray':       GObject.ParamSpec.boolean('systray', 'systray', 'systray', GObject.ParamFlags.WRITABLE, true),
+        'preview':       GObject.ParamSpec.boolean('preview', 'preview', 'preview', GObject.ParamFlags.READWRITE, true),
         'icon-name':     GObject.ParamSpec.string('icon-name', 'icon-name', 'icon name', GObject.ParamFlags.WRITABLE, ''),
         'shortcut':      GObject.ParamSpec.boolean('shortcut', 'shortcut', 'shortcut', GObject.ParamFlags.WRITABLE, false),
+        'auto-copy':     GObject.ParamSpec.boolean('auto-copy', 'auto-copy', 'auto-copy', GObject.ParamFlags.READWRITE, true),
         'menu-size':     GObject.ParamSpec.uint('menu-size', 'menu-size', 'menu size', GObject.ParamFlags.READWRITE, 1, 16, 8),
         'menu-style':    GObject.ParamSpec.uint('menu-style', 'menu-style', 'menu style', GObject.ParamFlags.WRITABLE, 0, 1, 0),
         'notify-style':  GObject.ParamSpec.uint('notify-style', 'notify-style', 'notify style', GObject.ParamFlags.READWRITE, 0, 1, 0),
-        'enable-notify': GObject.ParamSpec.boolean('enable-notify', 'enable-notify', 'enable notify', GObject.ParamFlags.READWRITE, false),
+        'enable-notify': GObject.ParamSpec.boolean('enable-notify', 'enable-notify', 'enable notify', GObject.ParamFlags.READWRITE, true),
     },
 }, class ColorPicker extends GObject.Object {
     _init() {
@@ -454,6 +458,7 @@ const ColorPicker = GObject.registerClass({
         gsettings.bind(Fields.COLORSCOLLECT,  this, 'collect',       Gio.SettingsBindFlags.GET);
         gsettings.bind(Fields.MENUSTYLE,      this, 'menu-style',    Gio.SettingsBindFlags.GET);
         gsettings.bind(Fields.MENUSIZE,       this, 'menu-size',     Gio.SettingsBindFlags.GET);
+        gsettings.bind(Fields.AUTOCOPY,       this, 'auto-copy',     Gio.SettingsBindFlags.GET);
         gsettings.bind(Fields.ENABLESHORTCUT, this, 'shortcut',      Gio.SettingsBindFlags.GET);
         gsettings.bind(Fields.ENABLENOTIFY,   this, 'enable-notify', Gio.SettingsBindFlags.GET);
         gsettings.bind(Fields.NOTIFYSTYLE,    this, 'notify-style',  Gio.SettingsBindFlags.GET);
@@ -521,12 +526,11 @@ const ColorPicker = GObject.registerClass({
 
     _updateMenu() {
         this._button.menu.removeAll();
-        if(this._menu_style == MENU.HISTORY) {
-            if(this._history) this._history.split('|').forEach(x => this._button.menu.addMenuItem(this._menuItemMaker(x)));
-        } else {
-            if(this._collect) this._collect.split('|').forEach(x => this._button.menu.addMenuItem(this._menuItemMaker(x)));
+        let colors = this._menu_style == MENU.HISTORY ? this._history : this._collect;
+        if(colors) {
+            colors.split('|').forEach(x => this._button.menu.addMenuItem(this._menuItemMaker(x)));
+            this._button.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem(''));
         }
-        this._button.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem(''));
         this._button.menu.addMenuItem(this._settingItem());
     }
 
@@ -536,7 +540,6 @@ const ColorPicker = GObject.registerClass({
             St.Clipboard.get_default().set_text(St.ClipboardType.CLIPBOARD, color);
         });
         let label = new St.Label({ x_expand: true, });
-        //NOTE: https://gitlab.gnome.org/GNOME/mutter/-/issues/1324
         label.clutter_text.set_markup(convToText(color));
         item.add_child(label);
 
@@ -601,8 +604,7 @@ const ColorPicker = GObject.registerClass({
     }
 
     _notify(actor, color) {
-        St.Clipboard.get_default().set_text(St.ClipboardType.CLIPBOARD, color);
-        if(!this._history.includes(color)) this._setHistory(color);
+        this._setHistory(color);
         if(!this.enable_notify) return;
         if(this.notify_style == NOTIFY.MSG) {
             Main.notify(Me.metadata.name, _('%s is picked.').format(color));
@@ -622,6 +624,7 @@ const ColorPicker = GObject.registerClass({
     }
 
     _setHistory(color) {
+        if(this.auto_copy) St.Clipboard.get_default().set_text(St.ClipboardType.CLIPBOARD, color);
         if(this._history) {
             let history = (color + '|' + this._history).split('|');
             gsettings.set_string(Fields.COLORSHISTORY, history.slice(0, this.menu_size).join('|'));

@@ -20,6 +20,9 @@ call plug#begin('~/.config/nvim/bundle')
 		Plug 'pangloss/vim-javascript'
 		Plug 'mxw/vim-jsx'
 		Plug 'neoclide/coc.nvim', {'do': { -> coc#util#install()}}
+		Plug 'vim-ruby/vim-ruby'	
+		Plug 'scrooloose/syntastic'
+		Plug 'vim-scripts/c.vim'
 call plug#end()
 
 "----------Setting.vim----------"
@@ -56,8 +59,10 @@ syntax enable
 set number
 set background=dark
 highlight Normal ctermbg=None
+
 colorscheme gruvbox
 let g:airline_theme='gruvbox'
+
 set termguicolors
 
 " Required for operations modifying multiple buffers like rename.

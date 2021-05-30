@@ -1,10 +1,10 @@
 .vimrc
 .zshrc
+.zshenv
+.taskrc
 .config/nvim/init.vim
-.config/onedrive/config
 .config/onedrive/
 .local/share/gnome-shell
 .themes
 .icons
 .autojump
-.oh-my-zsh

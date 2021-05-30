@@ -202,8 +202,27 @@ export PATH="$PATH:`yarn global bin`"
 
 
 
-
+RED='\033[0;31m'
+PURPLE='\033[0;35m'
+CYAN='\033[0;36m'
+NC='\033[0m' # No Color
 XMAS=`date -d "Jun 1" +%j`
 TODAY=`date +%j`
 DAYS=$(($XMAS - $TODAY))
-echo "You have: " + $DAYS + " days."
+
+echo -e "Hello, ${RED}" $USER "${PURPLE}"
+date
+echo "${CYAN}" $DAYS  "${NC} days"
+task list
+
+export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH"
+fpath+=${ZDOTDIR:-~}/.zsh_functions
+export PATH="$HOME/.rbenv/bin:$PATH"
+eval "$(rbenv init -)"
+export PATH = "$HOME/.rbenv/plugins/ruby-build/bin:$PATH"
+
+export ANDROID_HOME=$HOME/Android/Sdk
+export PATH=$PATH:$ANDROID_HOME/emulator
+export PATH=$PATH:$ANDROID_HOME/tools
+export PATH=$PATH:$ANDROID_HOME/tools/bin
+export PATH=$PATH:$ANDROID_HOME/platform-tools

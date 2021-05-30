@@ -1,3 +1,22 @@
+/*
+    Copyright © 2020, 2021 Aleksandr Mezin
+
+    This file is part of ddterm GNOME Shell extension.
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/
+
 'use strict';
 
 const System = imports.system;
@@ -8,8 +27,9 @@ function checked_import(libname, version) {
         imports.gi.versions[libname] = version;
         return imports.gi[libname];
     } catch (ex) {
-        const message = `Can't start ddterm - library ${libname}, version ${version} not available:\n${ex}`;
-        print(message);
+        const message = `Can't start ddterm - library ${libname}, version ${version} not available:\n${ex}\n\n` +
+            `You likely need to install the package that contains the file '${libname}-${version}.typelib'`;
+        printerr(message);
 
         if (typeof GLib !== 'undefined')
             GLib.spawn_sync(null, ['zenity', '--error', '--width=300', '--text', message], null, GLib.SpawnFlags.SEARCH_PATH, null);
@@ -114,12 +134,14 @@ const Application = GObject.registerClass(
             this.add_action(this.settings.create_action('shortcuts-enabled'));
             this.add_action(this.settings.create_action('scroll-on-output'));
             this.add_action(this.settings.create_action('scroll-on-keystroke'));
+            this.add_action(this.settings.create_action('preserve-working-directory'));
 
             this.gtk_settings = Gtk.Settings.get_default();
             this.settings.connect('changed::theme-variant', this.update_theme.bind(this));
             this.update_theme();
 
             this.setup_shortcut('shortcut-window-hide', 'win.hide');
+            this.setup_shortcut('shortcut-toggle-maximize', 'win.toggle-maximize');
             this.setup_shortcut('shortcut-terminal-copy', 'terminal.copy');
             this.setup_shortcut('shortcut-terminal-copy-html', 'terminal.copy-html');
             this.setup_shortcut('shortcut-terminal-paste', 'terminal.paste');
