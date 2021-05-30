@@ -22,21 +22,21 @@
     <application id="code_code.desktop" score="1833.25" last-seen="1622378868"/>
     <application id="atom_atom.desktop" score="0" last-seen="1622029218"/>
     <application id="microsoft-edge-dev.desktop" score="13190.4375" last-seen="1622351436"/>
-    <application id="org.gnome.Terminal.desktop" score="8388.6875" last-seen="1622378962"/>
+    <application id="org.gnome.Terminal.desktop" score="8483.6875" last-seen="1622383969"/>
     <application id="org.gnome.Shell.Extensions.desktop" score="80.75" last-seen="1621951277"/>
     <application id="org.gnome.Boxes.desktop" score="85.5" last-seen="1621933939"/>
-    <application id="org.gnome.Nautilus.desktop" score="571.1875" last-seen="1622378817"/>
+    <application id="org.gnome.Nautilus.desktop" score="583.1875" last-seen="1622379952"/>
     <application id="jetbrains-idea-ce.desktop" score="14716.9375" last-seen="1622351306"/>
     <application id="gparted.desktop" score="7" last-seen="1622038615"/>
     <application id="org.gnome.FileRoller.desktop" score="5" last-seen="1622119004"/>
     <application id="org.gnome.Evince.desktop" score="1100.5625" last-seen="1622178241"/>
     <application id="org.gnome.Totem.desktop" score="695" last-seen="1622178231"/>
     <application id="gnome-system-monitor.desktop" score="125.1875" last-seen="1621951275"/>
-    <application id="google-chrome.desktop" score="3348.9375" last-seen="1622378898"/>
+    <application id="google-chrome.desktop" score="3945.9375" last-seen="1622384027"/>
     <application id="org.gnome.baobab.desktop" score="32" last-seen="1621934024"/>
     <application id="teams.desktop" score="3409.4375" last-seen="1622178230"/>
     <application id="org.gnome.Builder.desktop" score="29.125" last-seen="1622248812"/>
-    <application id="org.gnome.gedit.desktop" score="79.625" last-seen="1622255995"/>
+    <application id="org.gnome.gedit.desktop" score="80.625" last-seen="1622379817"/>
     <application id="org.rnd2.cpupower_gui.desktop" score="861.375" last-seen="1622169297"/>
   </context>
 </application-state>

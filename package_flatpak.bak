@@ -1,0 +1,6 @@
+Fedora Platform	org.fedoraproject.Platform	34	f34	system
+GNOME Web	org.gnome.Epiphany	40.1	stable	system
+Extensions	org.gnome.Extensions	40.0	stable	system
+Quadrapassel	org.gnome.Quadrapassel	3.38	stable	system
+GNOME Sudoku	org.gnome.Sudoku	40.1	stable	system
+gitg	org.gnome.gitg	3.32.1	stable	system
