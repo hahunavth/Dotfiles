@@ -21,7 +21,7 @@
 
 /* exported init buildPrefsWidget createPrefsWidgetClass */
 
-const { GObject, Gdk, Gio, Gtk } = imports.gi;
+const { GLib, GObject, Gdk, Gio, Gtk } = imports.gi;
 
 const PALETTE_SIZE = 16;
 
@@ -70,6 +70,8 @@ function createPrefsWidgetClass(resource_path, util) {
                 'global_accel_renderer',
                 'shortcuts_list',
                 'global_shortcuts_list',
+                'spawn_user_shell',
+                'spawn_user_shell_login',
                 'spawn_custom_command',
                 'custom_command_entry',
                 'limit_scrollback_check',
@@ -107,6 +109,11 @@ function createPrefsWidgetClass(resource_path, util) {
                 'show_animation_combo',
                 'hide_animation_combo',
                 'panel_icon_type_combo',
+                'window_monitor_current_radio',
+                'window_monitor_primary_radio',
+                'window_monitor_focus_radio',
+                'window_monitor_connector_radio',
+                'monitor_combo',
             ].concat(palette_widgets()),
             Properties: {
                 'settings': GObject.ParamSpec.object('settings', '', '', GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY, Gio.Settings),
@@ -117,8 +124,6 @@ function createPrefsWidgetClass(resource_path, util) {
                 super._init(params);
 
                 const actions = Gio.SimpleActionGroup.new();
-                this.insert_action_group('settings', actions);
-
                 [
                     'window-above',
                     'window-stick',
@@ -139,7 +144,6 @@ function createPrefsWidgetClass(resource_path, util) {
                     'highlight-colors-set',
                     'use-theme-colors',
                     'bold-is-bright',
-                    'command',
                     'show-scrollbar',
                     'scroll-on-output',
                     'scroll-on-keystroke',
@@ -153,9 +157,11 @@ function createPrefsWidgetClass(resource_path, util) {
                     'detect-urls-email',
                     'detect-urls-news-man',
                     'preserve-working-directory',
+                    'transparent-background',
                 ].forEach(
                     key => actions.add_action(this.settings.create_action(key))
                 );
+                this.insert_action_group('settings', actions);
 
                 this.settings_bind('theme-variant', this.theme_variant_combo, 'active-id');
                 this.settings_bind('show-animation', this.show_animation_combo, 'active-id');
@@ -165,6 +171,28 @@ function createPrefsWidgetClass(resource_path, util) {
                 this.settings_bind('window-type-hint', this.window_type_hint_combo, 'active-id');
                 this.settings_bind('window-position', this.window_pos_combo, 'active-id');
                 this.settings_bind('panel-icon-type', this.panel_icon_type_combo, 'active-id');
+
+                this.display_config_proxy = Gio.DBusProxy.new_for_bus_sync(
+                    Gio.BusType.SESSION,
+                    Gio.DBusProxyFlags.NONE,
+                    null,
+                    'org.gnome.Mutter.DisplayConfig',
+                    '/org/gnome/Mutter/DisplayConfig',
+                    'org.gnome.Mutter.DisplayConfig',
+                    null
+                );
+                this.signal_connect(this.display_config_proxy, 'g-signal', (proxy, sender_name, signal_name) => {
+                    if (signal_name === 'MonitorsChanged')
+                        this.fill_monitors_combo();
+                });
+                this.fill_monitors_combo();
+
+                this.setup_radio('window-monitor', 'current', this.window_monitor_current_radio);
+                this.setup_radio('window-monitor', 'primary', this.window_monitor_primary_radio);
+                this.setup_radio('window-monitor', 'focus', this.window_monitor_focus_radio);
+                this.setup_radio('window-monitor', 'connector', this.window_monitor_connector_radio);
+                this.window_monitor_connector_radio.bind_property('active', this.monitor_combo.parent, 'sensitive', GObject.BindingFlags.SYNC_CREATE);
+                this.settings_bind('window-monitor-connector', this.monitor_combo, 'active-id');
 
                 this.settings_bind('tab-policy', this.tab_policy_combo, 'active-id');
                 this.settings_bind('tab-position', this.tab_position_combo, 'active-id');
@@ -200,6 +228,7 @@ function createPrefsWidgetClass(resource_path, util) {
 
                 this.settings_bind('background-opacity', this.opacity_adjustment, 'value');
                 this.set_scale_value_format_percent(this.opacity_scale);
+                this.bind_sensitive('transparent-background', this.opacity_scale.parent);
                 this.settings_bind('window-size', this.window_size_adjustment, 'value');
                 this.set_scale_value_format_percent(this.window_size_scale);
 
@@ -220,6 +249,10 @@ function createPrefsWidgetClass(resource_path, util) {
 
                 this.settings_bind('custom-command', this.custom_command_entry, 'text');
                 this.spawn_custom_command.bind_property('active', this.custom_command_entry.parent, 'sensitive', GObject.BindingFlags.SYNC_CREATE);
+
+                this.setup_radio('command', 'user-shell', this.spawn_user_shell);
+                this.setup_radio('command', 'user-shell-login', this.spawn_user_shell_login);
+                this.setup_radio('command', 'custom-command', this.spawn_custom_command);
 
                 this.settings_bind('scrollback-unlimited', this.limit_scrollback_check, 'active', Gio.SettingsBindFlags.INVERT_BOOLEAN);
                 this.settings_bind('scrollback-lines', this.scrollback_adjustment, 'value');
@@ -454,6 +487,63 @@ function createPrefsWidgetClass(resource_path, util) {
                         toplevel.restore_system_shortcuts();
                     }
                 );
+            }
+
+            setup_radio(setting, value, radio) {
+                this.settings.bind_writable(setting, radio, 'sensitive', false);
+                this.run_on_destroy(
+                    Gio.Settings.unbind.bind(null, radio, 'sensitive'),
+                    radio
+                );
+
+                const update_active = () => {
+                    if (this.settings.get_string(setting) === value) {
+                        if (!radio.active)
+                            radio.active = true;
+                    }
+                };
+
+                this.signal_connect(this.settings, `changed::${setting}`, update_active);
+                update_active();
+
+                this.signal_connect(radio, 'toggled', () => {
+                    if (radio.active)
+                        this.settings.set_string(setting, value);
+                });
+            }
+
+            fill_monitors_combo() {
+                const current_state = this.display_config_proxy.call_sync(
+                    'GetCurrentState',
+                    null,
+                    Gio.DBusCallFlags.NONE,
+                    -1,
+                    null
+                );
+
+                const [serial_, monitors, logical_monitors_, properties_] = current_state.unpack();
+
+                const prev_active_id = this.monitor_combo.active_id;
+                this.monitor_combo.freeze_notify();
+
+                try {
+                    this.monitor_combo.remove_all();
+
+                    for (let monitor_info of monitors.unpack()) {
+                        const [ids, modes_, props] = monitor_info.unpack();
+                        const [connector, vendor_, model, monitor_serial_] = ids.deep_unpack();
+                        let display_name = props.deep_unpack()['display-name'];
+
+                        if (display_name instanceof GLib.Variant)
+                            display_name = display_name.unpack();
+
+                        this.monitor_combo.append(connector, `${display_name} - ${model} (${connector})`);
+                    }
+
+                    this.monitor_combo.active_id = prev_active_id;
+                } finally {
+                    this.monitor_combo.thaw_notify();
+                }
             }
         }
     );

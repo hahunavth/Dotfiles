@@ -40,7 +40,7 @@ var Connections = class Connections {
     }
 
     disconnect_all_for(actor) {
-        actor_connections = this.buffer.filter((infos) => {
+        let actor_connections = this.buffer.filter((infos) => {
             infos.actor == actor
         });
 
@@ -69,6 +69,7 @@ var Connections = class Connections {
         this.buffer = [];
     }
 
+    // no need to check if DEBUG here, the log function is only used on error
     _log(str) {
         log(`[Blur my Shell] ${str}`)
     }

@@ -1,21 +1,23 @@
 'use strict';
 
-const { Shell, GLib, Gio, Meta } = imports.gi;
+const { Shell, Gio, Meta } = imports.gi;
 const Main = imports.ui.main;
 const backgroundSettings = new Gio.Settings({ schema: 'org.gnome.desktop.background' });
 
 const Me = imports.misc.extensionUtils.getCurrentExtension();
 const Settings = Me.imports.settings;
 const Utils = Me.imports.utilities;
-let prefs = new Settings.Prefs;
 
 const default_sigma = 30;
 const default_brightness = 0.6;
 
+let sigma = default_sigma;
+
 var OverviewBlur = class OverviewBlur {
-    constructor(connections) {
+    constructor(connections, prefs) {
         this.connections = connections;
         this.effects = [];
+        this.prefs = prefs;
     }
 
     enable() {
@@ -29,7 +31,7 @@ var OverviewBlur = class OverviewBlur {
         this.connections.connect(Main.layoutManager, 'monitors-changed', () => {
             if (!Main.screenShield.locked) {
                 this._log("changed monitors");
-                this.update_backgrounds()
+                this.update_backgrounds();
             }
         });
 
@@ -41,7 +43,8 @@ var OverviewBlur = class OverviewBlur {
         // remove every old background
         Main.layoutManager.overviewGroup.get_children().forEach(actor => {
             if (actor.constructor.name == 'Meta_BackgroundActor') {
-                Main.layoutManager.overviewGroup.remove_child(actor)
+                Main.layoutManager.overviewGroup.remove_child(actor);
+                actor.destroy();
             }
             this.effects = [];
         });
@@ -52,8 +55,8 @@ var OverviewBlur = class OverviewBlur {
             let background = Main.layoutManager._backgroundGroup.get_child_at_index(Main.layoutManager.monitors.length - monitor.index - 1);
             bg_actor.set_content(background.get_content());
             let effect = new Shell.BlurEffect({
-                brightness: prefs.BRIGHTNESS.get(),
-                sigma: prefs.SIGMA.get(),
+                brightness: this.prefs.BRIGHTNESS.get(),
+                sigma: this.prefs.SIGMA.get(),
                 mode: 0
             });
             bg_actor.add_effect(effect);
@@ -70,6 +73,7 @@ var OverviewBlur = class OverviewBlur {
         this.effects.forEach(effect => {
             effect.sigma = s;
         });
+        sigma = s;
     }
 
     set_brightness(b) {
@@ -90,6 +94,7 @@ var OverviewBlur = class OverviewBlur {
     }
 
     _log(str) {
-        log(`[Blur my Shell] ${str}`)
+        if (this.prefs.DEBUG.get())
+            log(`[Blur my Shell] ${str}`)
     }
 }

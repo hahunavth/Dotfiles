@@ -5,13 +5,11 @@
   "layouts": "org.gnome.shell.extensions.materialshell.layouts",
   "name": "Material Shell",
   "shell-version": [
-    "3.34",
-    "3.36",
-    "3.38"
+    "40"
   ],
   "theme": "org.gnome.shell.extensions.materialshell.theme",
   "tweaks": "org.gnome.shell.extensions.materialshell.tweaks",
   "url": "https://material-shell.com",
   "uuid": "material-shell@papyelgringo",
-  "version": 12
+  "version": 15
 }

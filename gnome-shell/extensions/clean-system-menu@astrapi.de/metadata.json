@@ -5,7 +5,7 @@
   "shell-version": [
     "40"
   ],
-  "url": "",
+  "url": "https://gitlab.gnome.org/astrapi/clean-system-menu",
   "uuid": "clean-system-menu@astrapi.de",
-  "version": 1
+  "version": 4
 }

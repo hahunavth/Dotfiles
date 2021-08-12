@@ -87,6 +87,9 @@ var DesktopGrid = class {
             }
         });
 
+        const scale = this._window.get_scale_factor();
+        this.gridGlobalRectangle = new Gdk.Rectangle({'x':this._x, 'y':this._y, 'width':(this._width*scale), 'height':(this._height*scale)});
+
         this._eventBox = new Gtk.EventBox({ visible: true });
         this._window.add(this._eventBox);
         this._container = new Gtk.Fixed();
@@ -156,7 +159,7 @@ var DesktopGrid = class {
     }
 
     setDropDestination(dropDestination) {
-        dropDestination.drag_dest_set(Gtk.DestDefaults.ALL, null, Gdk.DragAction.MOVE);
+        dropDestination.drag_dest_set(Gtk.DestDefaults.MOTION | Gtk.DestDefaults.DROP, null, Gdk.DragAction.MOVE);
         let targets = new Gtk.TargetList(null);
         targets.add(Gdk.atom_intern('x-special/ding-icon-list', false), Gtk.TargetFlags.SAME_APP, 0);
         targets.add(Gdk.atom_intern('x-special/gnome-icon-list', false), 0, 1);
@@ -217,18 +220,12 @@ var DesktopGrid = class {
     }
 
     _doDrawRubberBand(cr) {
-        if (this._desktopManager.rubberBand) {
-            let minX = Math.min(this._desktopManager.rubberBandInitX, this._desktopManager.mouseX);
-            let maxX = Math.max(this._desktopManager.rubberBandInitX, this._desktopManager.mouseX);
-            let minY = Math.min(this._desktopManager.rubberBandInitY, this._desktopManager.mouseY);
-            let maxY = Math.max(this._desktopManager.rubberBandInitY, this._desktopManager.mouseY);
-
-            if ((minX >= (this._x + this._width )) || (minY >= (this._y + this._height)) || (maxX < this._x) || (maxY < this._y)) {
+        if (this._desktopManager.rubberBand && this._desktopManager.selectionRectangle) {
+            if (! this.gridGlobalRectangle.intersect(this._desktopManager.selectionRectangle)[0]) {
                 return;
             }
-
-            let [xInit, yInit] = this._coordinatesGlobalToLocal(minX, minY);
-            let [xFin, yFin] = this._coordinatesGlobalToLocal(maxX, maxY);
+            let [xInit, yInit] = this._coordinatesGlobalToLocal(this._desktopManager.x1, this._desktopManager.y1);
+            let [xFin, yFin] = this._coordinatesGlobalToLocal(this._desktopManager.x2, this._desktopManager.y2);
 
             cr.rectangle(xInit + 0.5, yInit + 0.5, xFin - xInit, yFin - yInit);
             Gdk.cairo_set_source_rgba(cr, new Gdk.RGBA({red: this._desktopManager.selectColor.red,
@@ -306,7 +303,7 @@ var DesktopGrid = class {
 
         let localX = Math.floor(this._width * column / this._maxColumns);
         let localY = Math.floor(this._height * row / this._maxRows);
-        this._container.put(fileItem.actor, localX + elementSpacing, localY + elementSpacing);
+        this._container.put(fileItem.container, localX + elementSpacing, localY + elementSpacing);
         this._setGridUse(column, row, true);
         this._fileItems[fileItem.uri] = [column, row, fileItem];
         let [x, y] = this._coordinatesLocalToGlobal(localX + elementSpacing, localY + elementSpacing);
@@ -332,7 +329,7 @@ var DesktopGrid = class {
         if (fileItem.uri in this._fileItems) {
             let [column, row, tmp] = this._fileItems[fileItem.uri];
             this._setGridUse(column, row, false);
-            this._container.remove(fileItem.actor);
+            this._container.remove(fileItem.container);
             delete this._fileItems[fileItem.uri];
         }
     }

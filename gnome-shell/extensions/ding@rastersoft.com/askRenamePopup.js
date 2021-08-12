@@ -31,7 +31,7 @@ var AskRenamePopup = class {
 
         this._desktopPath = GLib.get_user_special_dir(GLib.UserDirectory.DIRECTORY_DESKTOP);
         this._fileItem = fileItem;
-        this._popover = new Gtk.Popover({relative_to: fileItem.actor,
+        this._popover = new Gtk.Popover({relative_to: fileItem.container,
                                          modal: true});
         let contentBox = new Gtk.Grid({row_spacing: 6,
                                        column_spacing: 6,
@@ -78,8 +78,9 @@ var AskRenamePopup = class {
     }
 
     _do_rename() {
-        DBusUtils.NautilusFileOperationsProxy.RenameFileRemote(this._fileItem.file.get_uri(),
-                                                               this._textArea.text,
+        DBusUtils.NautilusFileOperations2Proxy.RenameURIRemote(
+            this._fileItem.file.get_uri(), this._textArea.text,
+            DBusUtils.NautilusFileOperations2Proxy.platformData(),
             (result, error) => {
                 if (error)
                     throw new Error('Error renaming file: ' + error.message);

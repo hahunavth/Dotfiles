@@ -1,0 +1,10 @@
+{
+  "description": "One Drive extension",
+    "name": "example2",
+  "shell-version": [
+    "40"
+  ],
+  "url": "",
+  "uuid": "onedrive-client@hahunavth.github.com",
+  "version": 1
+}

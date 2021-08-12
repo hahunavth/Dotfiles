@@ -51,6 +51,13 @@
     <value nick="right" value="3"/>
   </enum>
 
+  <enum id="com.github.amezin.ddterm.WindowMonitor">
+    <value nick="current" value="0"/>
+    <value nick="primary" value="1"/>
+    <value nick="focus" value="2"/>
+    <value nick="connector" value="3"/>
+  </enum>
+
   <enum id="com.github.amezin.ddterm.EraseBinding">
     <value nick="auto" value="0"/>
     <value nick="ascii-backspace" value="1"/>
@@ -80,6 +87,8 @@
   </enum>
 
   <enum id="com.github.amezin.ddterm.AnimationMode">
+    <value nick="disable" value="0"/>
+
     <value nick="linear" value="1"/>
 
     <value nick="ease-in-quad" value="2"/>
@@ -139,6 +148,12 @@
     </key>
     <key name="window-position" enum="com.github.amezin.ddterm.WindowPosition">
       <default>'top'</default>
+    </key>
+    <key name="window-monitor" enum="com.github.amezin.ddterm.WindowMonitor">
+      <default>'current'</default>
+    </key>
+    <key name="window-monitor-connector" type="s">
+      <default>''</default>
     </key>
     <key name="panel-icon-type" enum="com.github.amezin.ddterm.PanelIconType">
       <default>'menu-button'</default>
@@ -282,6 +297,9 @@
     <key name="highlight-foreground-color" type="s">
       <default>'#ffffff'</default>
     </key>
+    <key name="transparent-background" type="b">
+      <default>true</default>
+    </key>
     <key name="background-opacity" type="d">
       <default>0.9</default>
       <range min="0.0" max="1.0"/>
@@ -360,6 +378,9 @@
     </key>
     <key name="shortcut-toggle-maximize" type="as">
       <default><![CDATA[['F11']]]></default>
+    </key>
+    <key name="shortcut-toggle-transparent-background" type="as">
+      <default><![CDATA[[]]]></default>
     </key>
     <key name="hide-window-on-esc" type="b">
       <default>false</default>

@@ -19,14 +19,14 @@
 
 'use strict';
 
-/* exported init enable disable settings current_window target_rect_for_workarea_size toggle */
+/* exported init enable disable settings current_window target_rect_for_workarea_size toggle connect disconnect */
 
 const { GLib, GObject, Gio, Atk, Clutter, Meta, Shell, St } = imports.gi;
 const ByteArray = imports.byteArray;
+const Signals = imports.signals;
 const Main = imports.ui.main;
 const PanelMenu = imports.ui.panelMenu;
 const PopupMenu = imports.ui.popupMenu;
-const WindowManager = imports.ui.windowManager;
 const Me = imports.misc.extensionUtils.getCurrentExtension();
 const { util } = Me.imports;
 
@@ -38,6 +38,8 @@ var current_window = null;
 var current_workarea = null;
 var current_monitor_scale = 1;
 var current_target_rect = null;
+var current_monitor_index = 0;
+var current_window_mapped = false;
 
 let bus_watch_id = null;
 let dbus_action_group = null;
@@ -146,22 +148,13 @@ class ExtensionDBusInterface {
         if (!current_window || !current_window.maximized_vertically)
             return;
 
-        Main.wm.skipNextEffect(current_window.get_compositor_private());
-
         // There is a update_window_geometry() call after successful unmaximize.
         // It must set window size to 100%.
         settings.set_double('window-size', 1.0);
 
-        // Changing window-size should unmaximize, but sometimes it doesn't, if
-        // window-size is already 1.0. So another unmaximize() is necessary.
-        // .unmaximize() emits notify::maximized-vertically even if the window
-        // wasn't maximized, so check if it's still maximized first
-        if (current_window.maximized_vertically)
-            current_window.unmaximize(Meta.MaximizeFlags.VERTICAL);
-
-        // Window still unmaximizes incorrectly without this.
-        // Show terminal, maximize, hide, show, start resizing with mouse.
-        move_resize_window(current_window, current_workarea);
+        Main.wm.skipNextEffect(current_window.get_compositor_private());
+        current_window.unmaximize(Meta.MaximizeFlags.VERTICAL);
+        schedule_geometry_fixup(current_window);
     }
 
     BeginResizeHorizontal() {
@@ -170,14 +163,11 @@ class ExtensionDBusInterface {
         if (!current_window || !current_window.maximized_horizontally)
             return;
 
-        Main.wm.skipNextEffect(current_window.get_compositor_private());
-
         settings.set_double('window-size', 1.0);
 
-        if (current_window.maximized_horizontally)
-            current_window.unmaximize(Meta.MaximizeFlags.HORIZONTAL);
-
-        move_resize_window(current_window, current_workarea);
+        Main.wm.skipNextEffect(current_window.get_compositor_private());
+        current_window.unmaximize(Meta.MaximizeFlags.HORIZONTAL);
+        schedule_geometry_fixup(current_window);
     }
 
     Toggle() {
@@ -218,13 +208,26 @@ class ConnectionSet {
 
     add(object, handler_id) {
         this.connections.push({ object, handler_id });
+        return handler_id;
     }
 
     connect(object, signal, callback) {
-        this.add(object, object.connect(signal, callback));
+        return this.add(object, object.connect(signal, callback));
     }
 
-    disconnect() {
+    disconnect(object = null, handler_id = null) {
+        if (handler_id) {
+            this.connections = this.connections.filter(
+                c => c.handler_id !== handler_id || c.object !== object
+            );
+            try {
+                object.disconnect(handler_id);
+            } catch (ex) {
+                logError(ex, `Can't disconnect handler ${handler_id} on object ${object}`);
+            }
+            return;
+        }
+
         while (this.connections.length) {
             const c = this.connections.pop();
             try {
@@ -244,11 +247,25 @@ const hide_when_focus_lost_connections = new ConnectionSet();
 const update_size_setting_on_grab_end_connections = new ConnectionSet();
 const geometry_fixup_connections = new ConnectionSet();
 
+class ExtensionSignals {
+}
+Signals.addSignalMethods(ExtensionSignals.prototype);
+
+const extension_signals = new ExtensionSignals();
+
+function connect(name, callback) {
+    return extension_signals.connect(name, callback);
+}
+
+function disconnect(id) {
+    return extension_signals.disconnect(id);
+}
+
 function init() {
     try {
-        tests = Me.imports.extension_tests;
+        tests = Me.imports.test.extension_tests;
     } catch {
-        // Test aren't included in end user (extensions.gnome.org) packages
+        // Tests aren't included in end user (extensions.gnome.org) packages
     }
 }
 
@@ -281,24 +298,23 @@ function enable() {
     );
 
     extension_connections.connect(global.display, 'window-created', handle_window_created);
-    extension_connections.connect(global.display, 'workareas-changed', update_workarea_for_window);
-    extension_connections.connect(global.display, 'workareas-changed', update_window_geometry);
+    extension_connections.connect(global.display, 'workareas-changed', update_workarea);
     extension_connections.connect(settings, 'changed::window-above', set_window_above);
     extension_connections.connect(settings, 'changed::window-stick', set_window_stick);
     extension_connections.connect(settings, 'changed::window-size', update_target_rect);
     extension_connections.connect(settings, 'changed::window-size', disable_window_maximize_setting);
-    extension_connections.connect(settings, 'changed::window-size', update_window_geometry);
     extension_connections.connect(settings, 'changed::window-position', update_window_position);
-    extension_connections.connect(settings, 'changed::window-position', update_window_geometry);
     extension_connections.connect(settings, 'changed::window-skip-taskbar', set_skip_taskbar);
     extension_connections.connect(settings, 'changed::window-maximize', set_window_maximized);
+    extension_connections.connect(settings, 'changed::window-monitor', () => update_monitor_index());
+    extension_connections.connect(settings, 'changed::window-monitor-connector', () => update_monitor_index());
     extension_connections.connect(settings, 'changed::override-window-animation', setup_animation_overrides);
     extension_connections.connect(settings, 'changed::show-animation', update_show_animation);
     extension_connections.connect(settings, 'changed::hide-animation', update_hide_animation);
     extension_connections.connect(settings, 'changed::hide-when-focus-lost', setup_hide_when_focus_lost);
     extension_connections.connect(settings, 'changed::panel-icon-type', setup_panel_icon);
 
-    update_workarea_for_window();
+    update_workarea();
     update_window_position();
     update_show_animation();
     update_hide_animation();
@@ -448,12 +464,12 @@ function handle_window_created(display, win) {
         win.connect('notify::gtk-window-object-path', set_current_window),
     ];
 
-    const disconnect = () => {
+    const disconnect_handlers = () => {
         handler_ids.forEach(handler => win.disconnect(handler));
     };
 
-    handler_ids.push(win.connect('unmanaging', disconnect));
-    handler_ids.push(win.connect('unmanaged', disconnect));
+    handler_ids.push(win.connect('unmanaging', disconnect_handlers));
+    handler_ids.push(win.connect('unmanaged', disconnect_handlers));
 
     set_current_window(win);
 }
@@ -487,46 +503,80 @@ function setup_animation_overrides() {
     if (!settings.get_boolean('override-window-animation'))
         return;
 
-    animation_overrides_connections.connect(global.window_manager, 'map', override_map_animation);
-    animation_overrides_connections.connect(global.window_manager, 'destroy', override_unmap_animation);
+    if (current_window_mapped)
+        animation_overrides_connections.connect(global.window_manager, 'destroy', override_unmap_animation);
+    else
+        animation_overrides_connections.connect(global.window_manager, 'map', override_map_animation);
+}
+
+function animation_mode_from_settings(key) {
+    const nick = settings.get_string(key);
+    if (nick === 'disable')
+        return null;
+
+    return util.enum_from_settings(nick, Clutter.AnimationMode);
 }
 
 function update_show_animation() {
-    show_animation = util.enum_from_settings(settings.get_string('show-animation'), Clutter.AnimationMode);
+    show_animation = animation_mode_from_settings('show-animation');
 }
 
 function update_hide_animation() {
-    hide_animation = util.enum_from_settings(settings.get_string('hide-animation'), Clutter.AnimationMode);
+    hide_animation = animation_mode_from_settings('hide-animation');
 }
 
 function override_map_animation(wm, actor) {
     if (!check_current_window() || actor !== current_window.get_compositor_private())
         return;
 
-    actor.set_pivot_point(animation_pivot_x, animation_pivot_y);
-    actor.scale_x = animation_scale_x;
-    actor.scale_y = animation_scale_y;
+    if (!show_animation) {
+        actor.remove_all_transitions();
+        return;
+    }
 
-    actor.ease({
-        scale_x: 1.0,
-        scale_y: 1.0,
-        duration: WindowManager.SHOW_WINDOW_ANIMATION_TIME,
-        mode: show_animation,
-    });
+    actor.set_pivot_point(animation_pivot_x, animation_pivot_y);
+
+    const scale_x_anim = actor.get_transition('scale-x');
+
+    if (scale_x_anim) {
+        scale_x_anim.set_from(animation_scale_x);
+        scale_x_anim.set_to(1.0);
+        scale_x_anim.progress_mode = show_animation;
+    }
+
+    const scale_y_anim = actor.get_transition('scale-y');
+
+    if (scale_y_anim) {
+        scale_y_anim.set_from(animation_scale_y);
+        scale_y_anim.set_to(1.0);
+        scale_y_anim.progress_mode = show_animation;
+    }
 }
 
 function override_unmap_animation(wm, actor) {
     if (!check_current_window() || actor !== current_window.get_compositor_private())
         return;
 
+    if (!hide_animation) {
+        actor.remove_all_transitions();
+        return;
+    }
+
     actor.set_pivot_point(animation_pivot_x, animation_pivot_y);
 
-    actor.ease({
-        scale_x: animation_scale_x,
-        scale_y: animation_scale_y,
-        duration: WindowManager.DESTROY_WINDOW_ANIMATION_TIME,
-        mode: hide_animation,
-    });
+    const scale_x_anim = actor.get_transition('scale-x');
+
+    if (scale_x_anim) {
+        scale_x_anim.set_to(animation_scale_x);
+        scale_x_anim.progress_mode = hide_animation;
+    }
+
+    const scale_y_anim = actor.get_transition('scale-y');
+
+    if (scale_y_anim) {
+        scale_y_anim.set_to(animation_scale_y);
+        scale_y_anim.progress_mode = hide_animation;
+    }
 }
 
 function hide_when_focus_lost() {
@@ -602,21 +652,55 @@ function set_skip_taskbar() {
         wayland_client.show_in_window_list(current_window);
 }
 
-function update_workarea(monitor_index) {
-    if (monitor_index < 0)
+function update_workarea() {
+    if (current_monitor_index >= global.display.get_n_monitors()) {
+        update_monitor_index();
         return;
+    }
 
-    current_workarea = Main.layoutManager.getWorkAreaForMonitor(monitor_index);
-    current_monitor_scale = global.display.get_monitor_scale(monitor_index);
+    current_workarea = Main.layoutManager.getWorkAreaForMonitor(current_monitor_index);
+    current_monitor_scale = global.display.get_monitor_scale(current_monitor_index);
 
     update_target_rect();
 }
 
-function update_workarea_for_window() {
-    if (!current_window)
+function get_monitor_index() {
+    if (settings.get_string('window-monitor') === 'primary') {
+        if (Main.layoutManager.primaryIndex >= 0)
+            return Main.layoutManager.primaryIndex;
+    }
+
+    if (settings.get_string('window-monitor') === 'focus') {
+        if (Main.layoutManager.focusIndex >= 0)
+            return Main.layoutManager.focusIndex;
+    }
+
+    if (settings.get_string('window-monitor') === 'connector') {
+        const monitor_manager = Meta.MonitorManager.get();
+        if (monitor_manager) {
+            const index = monitor_manager.get_monitor_for_connector(settings.get_string('window-monitor-connector'));
+            if (index >= 0)
+                return index;
+        }
+    }
+
+    return global.display.get_current_monitor();
+}
+
+function update_monitor_index(force = false) {
+    const new_monitor_index = get_monitor_index();
+
+    if (!force && new_monitor_index === current_monitor_index)
         return;
 
-    update_workarea(current_window.get_monitor());
+    current_monitor_index = new_monitor_index;
+
+    if (current_window) {
+        if (force || current_window.get_monitor() !== current_monitor_index)
+            current_window.move_to_monitor(current_monitor_index);
+    }
+
+    update_workarea();
 }
 
 function setup_maximized_handlers() {
@@ -641,31 +725,55 @@ function set_current_window(win) {
         return;
 
     release_window(current_window);
-    current_window = win;
 
-    update_workarea(Main.layoutManager.currentMonitor.index);
+    current_window = win;
+    extension_signals.emit('window-changed');
 
     current_window_connections.connect(win, 'unmanaged', release_window);
-    current_window_connections.connect(win, 'notify::window-type', setup_animation_overrides);
+    current_window_connections.connect(win, 'unmanaging', () => {
+        if (settings.get_boolean('override-window-animation') && !hide_animation)
+            Main.wm.skipNextEffect(current_window.get_compositor_private());
+    });
 
     setup_maximized_handlers();
-    setup_update_size_setting_on_grab_end();
-    setup_hide_when_focus_lost();
+
+    update_monitor_index(true);
+
+    // Setting up animations early, so 'current_window_mapped' will be 'false'
+    // in the 'map' handler (animation's handler will run before 'map_handler_id'.
+    // 'notify::window-type' could move animation's handler after 'map_handler_id',
+    // but that should not be a significant issue: the window will most likely be
+    // already visible, and 'destroy' handler does not need any specific ordering.
+    current_window_connections.connect(win, 'notify::window-type', setup_animation_overrides);
     setup_animation_overrides();
 
-    move_resize_window(win, current_target_rect);
+    const map_handler_id = current_window_connections.connect(global.window_manager, 'map', (wm, actor) => {
+        if (check_current_window() && actor === current_window.get_compositor_private()) {
+            current_window_mapped = true;
+            current_window_connections.disconnect(global.window_manager, map_handler_id);
+            setup_animation_overrides();
 
-    // https://github.com/amezin/gnome-shell-extension-ddterm/issues/28
-    current_window_connections.connect(win, 'shown', update_window_geometry);
-    // Necessary on GNOME <40 (Wayland) + bottom window position
-    current_window_connections.connect(win, 'shown', schedule_geometry_fixup);
+            if (win.get_client_type() === Meta.WindowClientType.WAYLAND) {
+                current_window.move_to_monitor(current_monitor_index);
+                update_window_geometry();
+            }
+        }
+    });
+
+    if (settings.get_boolean('override-window-animation') && !show_animation)
+        Main.wm.skipNextEffect(current_window.get_compositor_private());
+
+    setup_update_size_setting_on_grab_end();
+    setup_hide_when_focus_lost();
 
     Main.activateWindow(win);
 
     set_window_above();
     set_window_stick();
     set_skip_taskbar();
-    set_window_maximized();
+
+    if (settings.get_boolean('window-maximize'))
+        win.maximize(Meta.MaximizeFlags.BOTH);
 
     if (panel_icon)
         panel_icon.update();
@@ -717,6 +825,8 @@ function update_target_rect() {
         current_monitor_scale,
         settings.get_double('window-size')
     );
+
+    update_window_geometry();
 }
 
 function schedule_geometry_fixup(win) {
@@ -731,7 +841,6 @@ function schedule_geometry_fixup(win) {
 function unmaximize_done() {
     settings.set_boolean('window-maximize', false);
     update_window_geometry();
-    schedule_geometry_fixup(current_window);
 
     // https://github.com/amezin/gnome-shell-extension-ddterm/issues/48
     if (settings.get_boolean('window-above')) {
@@ -739,11 +848,14 @@ function unmaximize_done() {
         current_window.unmake_above();
         set_window_above();
     }
+
+    if (!current_window_mapped) {
+        if (settings.get_boolean('override-window-animation') && !show_animation)
+            Main.wm.skipNextEffect(current_window.get_compositor_private());
+    }
 }
 
 function handle_maximized_vertically(win) {
-    geometry_fixup_connections.disconnect();
-
     if (!check_current_window(win))
         return;
 
@@ -752,15 +864,18 @@ function handle_maximized_vertically(win) {
         return;
     }
 
-    if (!settings.get_boolean('window-maximize')) {
-        if (current_target_rect.height < current_workarea.height)
-            win.unmaximize(Meta.MaximizeFlags.VERTICAL);
+    if (settings.get_boolean('window-maximize'))
+        return;
+
+    if (current_target_rect.height < current_workarea.height) {
+        Main.wm.skipNextEffect(current_window.get_compositor_private());
+        win.unmaximize(Meta.MaximizeFlags.VERTICAL);
+    } else {
+        settings.set_boolean('window-maximize', true);
     }
 }
 
 function handle_maximized_horizontally(win) {
-    geometry_fixup_connections.disconnect();
-
     if (!check_current_window(win))
         return;
 
@@ -769,14 +884,20 @@ function handle_maximized_horizontally(win) {
         return;
     }
 
-    if (!settings.get_boolean('window-maximize')) {
-        if (current_target_rect.width < current_workarea.width)
-            win.unmaximize(Meta.MaximizeFlags.HORIZONTAL);
+    if (settings.get_boolean('window-maximize'))
+        return;
+
+    if (current_target_rect.width < current_workarea.width) {
+        Main.wm.skipNextEffect(current_window.get_compositor_private());
+        win.unmaximize(Meta.MaximizeFlags.HORIZONTAL);
+    } else {
+        settings.set_boolean('window-maximize', true);
     }
 }
 
 function move_resize_window(win, target_rect) {
     win.move_resize_frame(false, target_rect.x, target_rect.y, target_rect.width, target_rect.height);
+    extension_signals.emit('move-resize-requested', target_rect);
 }
 
 function set_window_maximized() {
@@ -790,22 +911,15 @@ function set_window_maximized() {
 
     if (should_maximize) {
         current_window.maximize(Meta.MaximizeFlags.BOTH);
-        return;
-    }
-
-    if (resize_x) {
-        if (current_target_rect.width < current_workarea.width)
-            current_window.unmaximize(Meta.MaximizeFlags.HORIZONTAL);
     } else {
-        // eslint-disable-next-line no-lonely-if
-        if (current_target_rect.height < current_workarea.height)
-            current_window.unmaximize(Meta.MaximizeFlags.VERTICAL);
+        current_window.unmaximize(resize_x ? Meta.MaximizeFlags.HORIZONTAL : Meta.MaximizeFlags.VERTICAL);
+        schedule_geometry_fixup(current_window);
     }
 }
 
 function disable_window_maximize_setting() {
-    // maximize state is always off after a height change
-    settings.set_boolean('window-maximize', false);
+    if (current_target_rect.height < current_workarea.height || current_target_rect.width < current_workarea.width)
+        settings.set_boolean('window-maximize', false);
 }
 
 function update_window_geometry() {
@@ -817,22 +931,19 @@ function update_window_geometry() {
     if (settings.get_boolean('window-maximize'))
         return;
 
-    if (current_target_rect.equal(current_window.get_frame_rect()))
+    if (current_window.maximized_horizontally && current_target_rect.width < current_workarea.width) {
+        Main.wm.skipNextEffect(current_window.get_compositor_private());
+        current_window.unmaximize(Meta.MaximizeFlags.HORIZONTAL);
         return;
-
-    if (current_window.maximized_horizontally && resize_x) {
-        if (current_target_rect.width < current_workarea.width) {
-            Main.wm.skipNextEffect(current_window.get_compositor_private());
-            current_window.unmaximize(Meta.MaximizeFlags.HORIZONTAL);
-        }
-    } else if (current_window.maximized_vertically && !resize_x) {
-        if (current_target_rect.height < current_workarea.height) {
-            Main.wm.skipNextEffect(current_window.get_compositor_private());
-            current_window.unmaximize(Meta.MaximizeFlags.VERTICAL);
-        }
-    } else {
-        move_resize_window(current_window, current_target_rect);
     }
+
+    if (current_window.maximized_vertically && current_target_rect.height < current_workarea.height) {
+        Main.wm.skipNextEffect(current_window.get_compositor_private());
+        current_window.unmaximize(Meta.MaximizeFlags.VERTICAL);
+        return;
+    }
+
+    move_resize_window(current_window, current_target_rect);
 }
 
 function update_size_setting_on_grab_end(display, p0, p1) {
@@ -867,7 +978,10 @@ function release_window(win) {
     current_window_connections.disconnect();
     current_window_maximized_connections.disconnect();
     geometry_fixup_connections.disconnect();
+
     current_window = null;
+    current_window_mapped = false;
+    extension_signals.emit('window-changed');
 
     update_size_setting_on_grab_end_connections.disconnect();
     hide_when_focus_lost_connections.disconnect();

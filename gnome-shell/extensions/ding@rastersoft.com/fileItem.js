@@ -24,6 +24,7 @@ const Gio = imports.gi.Gio;
 const GLib = imports.gi.GLib;
 const Pango = imports.gi.Pango;
 const GdkPixbuf = imports.gi.GdkPixbuf;
+const Cairo = imports.gi.cairo;
 const GnomeDesktop = imports.gi.GnomeDesktop;
 const DesktopIconsUtil = imports.desktopIconsUtil;
 
@@ -50,31 +51,31 @@ var FileItem = class {
         this._queryFileInfoCancellable = null;
         this._isSpecial = this._fileExtra != Enums.FileType.NONE;
         this._grid = null;
+        this._lastClickTime = 0;
+        this._lastClickButton = 0;
+        this._clickCount = 0;
 
         this._file = file;
 
         this._savedCoordinates = this._readCoordinatesFromAttribute(fileInfo, 'metadata::nautilus-icon-position');
         this._dropCoordinates = this._readCoordinatesFromAttribute(fileInfo, 'metadata::nautilus-drop-position');
 
-        this.actor = new Gtk.EventBox({visible: true});
-        this.actor.connect('destroy', () => this._onDestroy());
-
-        this._eventBox = new Gtk.EventBox({visible: true});
-
-        this._innerContainer = new Gtk.Box({orientation: Gtk.Orientation.VERTICAL});
-        this._container = new Gtk.Box({orientation: Gtk.Orientation.VERTICAL});
-        this._styleContext = this._innerContainer.get_style_context();
-        this._eventBox.add(this._innerContainer);
-
+        this.container = new Gtk.Box({orientation: Gtk.Orientation.VERTICAL, halign: Gtk.Align.CENTER});
+        this.container.connect('destroy', () => this._onDestroy());
+        this._eventBox = new Gtk.EventBox({visible: true, halign: Gtk.Align.CENTER});
+        this._sheildEventBox = new Gtk.EventBox({visible: true, halign: Gtk.Align.CENTER});
+        this._labelEventBox = new Gtk.EventBox({visible: true, halign: Gtk.Align.CENTER});
+        this._sheildLabelEventBox = new Gtk.EventBox({visible: true, halign: Gtk.Align.CENTER});
 
         this._icon = new Gtk.Image();
         this._iconContainer = new Gtk.Box({orientation: Gtk.Orientation.VERTICAL});
-        this._innerContainer.pack_start(this._iconContainer, false, false, 0);
-        this._iconContainer.set_size_request(Prefs.get_desired_width(), Prefs.get_icon_size());
         this._iconContainer.pack_start(this._icon, true, true, 0);
         this._iconContainer.set_baseline_position(Gtk.BaselinePosition.CENTER);
+        this._eventBox.add(this._iconContainer);
+        this._sheildEventBox.add(this._eventBox);
 
         this._label = new Gtk.Label();
+        this._labelContainer = new Gtk.Box({orientation: Gtk.Orientation.VERTICAL, halign: Gtk.Align.CENTER});
         let labelStyleContext = this._label.get_style_context();
         labelStyleContext.add_class('file-label');
         this._label.set_ellipsize(Pango.EllipsizeMode.END);
@@ -84,29 +85,50 @@ var FileItem = class {
         this._label.set_justify(Gtk.Justification.CENTER);
         this._label.set_lines(2);
         this._setFileName(fileInfo.get_display_name());
+        this._labelContainer.pack_start(this._label, false, true, 0);
+        this._labelEventBox.add(this._labelContainer);
+        this._sheildLabelEventBox.add(this._labelEventBox);
 
-        this._innerContainer.pack_start(this._label, false, true, 0);
-        this._container.pack_start(this._eventBox, false, false, 0);
-        this.actor.add(this._container);
+        this.container.pack_start(this._sheildEventBox, false, false, 0);
+        this.container.pack_start(this._sheildLabelEventBox, false, false, 2);
+
+        this._styleContext = this._iconContainer.get_style_context();
+        this._labelStyleContext = this._labelContainer.get_style_context();
+        this._styleContext.add_class('file-item');
+        this._labelStyleContext.add_class('file-item');
+
+        this.iconRectangle = new Gdk.Rectangle();
+        this.labelRectangle = new Gdk.Rectangle();
 
         /* We need to allow the "button-press" event to pass through the callbacks, to allow the DnD to work
          * But we must avoid them to reach the main window.
          * The solution is to allow them to pass in a EventBox, used both for detecting the events and the DnD, and block them
          * in a second EventBox, located outside.
          */
-
-        this.actor.connect('button-press-event', (actor, event) => {return true;});
+        this._sheildEventBox.connect('button-press-event', (actor, event) => {return true;});
+        this._sheildLabelEventBox.connect('button-press-event', (actor, event) => {return true;});
         this._eventBox.connect('button-press-event', (actor, event) => this._onPressButton(actor, event));
         this._eventBox.connect('enter-notify-event', (actor, event) => this._onEnter(actor, event));
         this._eventBox.connect('leave-notify-event', (actor, event) => this._onLeave(actor, event));
         this._eventBox.connect('button-release-event', (actor, event) => this._onReleaseButton(actor, event));
+        this._eventBox.connect('drag-motion', () => this._labelEventBox.drag_highlight());
+        this._eventBox.connect('drag-leave', () => this._labelEventBox.drag_unhighlight());
+        this._eventBox.connect('size-allocate', () => this._calculateIconRectangle());
+        this._labelEventBox.connect('button-press-event', (actor, event) => this._onPressButton(actor, event));
+        this._labelEventBox.connect('enter-notify-event', (actor, event) => this._onEnter(actor, event));
+        this._labelEventBox.connect('leave-notify-event', (actor, event) => this._onLeave(actor, event));
+        this._labelEventBox.connect('button-release-event', (actor, event) => this._onReleaseButton(actor, event));
+        this._labelEventBox.connect('drag-motion', () => this._eventBox.drag_highlight());
+        this._labelEventBox.connect('drag-leave', () => this._eventBox.drag_unhighlight());
+        this._labelEventBox.connect('size-allocate', () => this._calculateLabelRectangle());
 
         /* Set the metadata and update relevant UI */
         this._updateMetadataFromFileInfo(fileInfo);
 
         this._setDropDestination(this._eventBox);
-        this._dragSource = this._eventBox;
-        this._setDragSource(this._dragSource);
+        this._setDropDestination(this._labelEventBox);
+        this._setDragSource(this._eventBox);
+        this._setDragSource(this._labelEventBox);
         this._menu = null;
         this._updateIcon();
         this._isSelected = false;
@@ -138,11 +160,33 @@ var FileItem = class {
                 }
             });
         }
-        this.actor.show_all();
+        this.container.show_all();
         this._updateName();
         if (this._dropCoordinates) {
             this.setSelected();
         }
+    }
+
+    _calculateIconRectangle() {
+        this.iconwidth = this._iconContainer.get_allocated_width();
+        this.iconheight = this._iconContainer.get_allocated_height();
+        let x = this._x1 + ((this.width - this.iconwidth)/2)*this._zoom;
+        let y = this._y1 + 2;
+        this.iconRectangle.x = x;
+        this.iconRectangle.y = y;
+        this.iconRectangle.width = this.iconwidth*this._zoom;
+        this.iconRectangle.height = this.iconheight*this._zoom;
+    }
+
+    _calculateLabelRectangle() {
+        this.labelwidth = this._labelContainer.get_allocated_width();
+        this.labelheight = this._labelContainer.get_allocated_height();
+        let x = this._x1 + ((this.width - this.labelwidth)/2)*this._zoom;
+        let y = this._y1 + 4 + (this.iconheight)*this._zoom;
+        this.labelRectangle.x = x;
+        this.labelRectangle.y = y;
+        this.labelRectangle.width = this.labelwidth*this._zoom;
+        this.labelRectangle.height = this.labelheight*this._zoom;
     }
 
     _setFileName(text) {
@@ -181,8 +225,8 @@ var FileItem = class {
         }
     }
 
-    _setDragSource() {
-        this._dragSource.drag_source_set(Gdk.ModifierType.BUTTON1_MASK, null, Gdk.DragAction.MOVE | Gdk.DragAction.COPY);
+    _setDragSource(widget) {
+        widget.drag_source_set(Gdk.ModifierType.BUTTON1_MASK, null, Gdk.DragAction.MOVE | Gdk.DragAction.COPY);
         let targets = new Gtk.TargetList(null);
         targets.add(Gdk.atom_intern('x-special/ding-icon-list', false), Gtk.TargetFlags.SAME_APP, 0);
         if ((this._fileExtra != Enums.FileType.USER_DIRECTORY_TRASH) &&
@@ -191,20 +235,53 @@ var FileItem = class {
                 targets.add(Gdk.atom_intern('x-special/gnome-icon-list', false), 0, 1);
                 targets.add(Gdk.atom_intern('text/uri-list', false), 0, 2);
         }
-        this._dragSource.drag_source_set_target_list(targets);
-        this._dragSource.connect('drag-begin', (widget, context) => {
+        widget.drag_source_set_target_list(targets);
+        widget.connect('drag-begin', (widget, context) => {
+            let surf = new Cairo.ImageSurface(Cairo.SurfaceType.IMAGE, this.container.get_allocated_width(), this.container.get_allocated_height());
+            let cr = new Cairo.Context(surf);
+            this.container.draw(cr);
+            let itemnumber = this._desktopManager.getNumberOfSelectedItems();
+            if (itemnumber > 1) {
+                Gdk.cairo_set_source_rgba(cr, new Gdk.RGBA({red: this._desktopManager.selectColor.red,
+                                                            green: this._desktopManager.selectColor.green,
+                                                            blue: this._desktopManager.selectColor.blue,
+                                                            alpha: 0.6})
+                );
+                itemnumber -= 1;
+                switch (itemnumber.toString().length) {
+                    case 1: cr.rectangle(1, 1, 30, 20); break;
+                    case 2: cr.rectangle(1, 1, 40, 20); break;
+                    default: cr.rectangle(1, 1, 50, 20); break;
+                }
+                cr.fill();
+                cr.setFontSize(18);
+                Gdk.cairo_set_source_rgba(cr, new Gdk.RGBA({red: 1.0, green: 1.0 , blue: 1.0, alpha: 1}));
+                cr.moveTo(1,17);
+                cr.showText(`+${itemnumber}`)
+            }
+            Gtk.drag_set_icon_surface(context, surf);
+            let [x, y] = this._calculateOffset(widget);
+            context.set_hotspot(x,y);
             this._desktopManager.onDragBegin(this);
         });
-        this._dragSource.connect('drag-data-get', (widget, context, data, info, time) => {
+        widget.connect('drag-data-get', (widget, context, data, info, time) => {
             let dragData = this._desktopManager.fillDragDataGet(info);
             if (dragData != null) {
                 let list = ByteArray.fromString(dragData[1]);
                 data.set(dragData[0], 8, list);
             }
         });
-        this._dragSource.connect('drag-end', (widget, context) => {
+        widget.connect('drag-end', (widget, context) => {
             this._desktopManager.onDragEnd();
         })
+    }
+
+    _calculateOffset(widget) {
+        if (widget == this._eventBox) {
+            return [((this.width - this.iconwidth)/2) + this._buttonPressInitialX, this._buttonPressInitialY];
+        } else {
+            return [((this.width - this.labelwidth)/2) + this._buttonPressInitialX, (this.iconheight + 2) + this._buttonPressInitialY];
+        }
     }
 
     _setDropDestination(dropDestination) {
@@ -234,7 +311,9 @@ var FileItem = class {
                                 let data = Gio.File.new_for_uri(fileList[0]).query_info('id::filesystem', Gio.FileQueryInfoFlags.NONE, null);
                                 let id_fs = data.get_attribute_string('id::filesystem');
                                 if (this._desktopManager.desktopFsId == id_fs) {
-                                    DBusUtils.NautilusFileOperationsProxy.MoveURIsRemote(fileList, this._file.get_uri(),
+                                    DBusUtils.NautilusFileOperations2Proxy.MoveURIsRemote(
+                                        fileList, this._file.get_uri(),
+                                        DBusUtils.NautilusFileOperations2Proxy.platformData(),
                                         (result, error) => {
                                             if (error) {
                                                 throw new Error('Error moving files: ' + error.message);
@@ -242,7 +321,9 @@ var FileItem = class {
                                         }
                                     );
                                 } else {
-                                    DBusUtils.NautilusFileOperationsProxy.CopyURIsRemote(fileList, this._file.get_uri(),
+                                    DBusUtils.NautilusFileOperations2Proxy.CopyURIsRemote(
+                                        fileList, this._file.get_uri(),
+                                        DBusUtils.NautilusFileOperations2Proxy.platformData(),
                                         (result, error) => {
                                             if (error) {
                                                 throw new Error('Error moving files: ' + error.message);
@@ -251,7 +332,9 @@ var FileItem = class {
                                     );
                                 }
                             } else {
-                                DBusUtils.NautilusFileOperationsProxy.TrashFilesRemote(fileList,
+                                DBusUtils.NautilusFileOperations2Proxy.TrashURIsRemote(
+                                    fileList,
+                                    DBusUtils.NautilusFileOperations2Proxy.platformData(),
                                     (result, error) => {
                                         if (error) {
                                             throw new Error('Error moving files: ' + error.message);
@@ -275,15 +358,19 @@ var FileItem = class {
     setCoordinates(x, y, width, height, margin, zoom, grid) {
         this._x1 = x;
         this._y1 = y;
+        this.width = width;
+        this.height = height;
         this._zoom = zoom;
         this._x2 = x + (width * zoom) - 1;
         this._y2 = y + (height * zoom) - 1;
         this._grid = grid;
-        this._container.set_size_request(width, height);
+        this.container.set_size_request(width, height);
         this._label.margin_start = margin;
         this._label.margin_end = margin;
         this._label.margin_bottom = margin;
         this._iconContainer.margin_top = margin;
+        this._calculateIconRectangle();
+        this._calculateLabelRectangle();
     }
 
     getCoordinates() {
@@ -345,6 +432,10 @@ var FileItem = class {
         );
     }
 
+    updatedMetadata() {
+        this._refreshMetadataAsync(true);
+    }
+
     _updateMetadataFromFileInfo(fileInfo) {
         this._fileInfo = fileInfo;
 
@@ -398,6 +489,7 @@ var FileItem = class {
     }
 
     _updateIcon() {
+        this._icon.set_padding(0,0);
         try {
             let customIcon = this._fileInfo.get_attribute_as_string('metadata::custom-icon');
             if (customIcon && (customIcon != '')) {
@@ -414,8 +506,9 @@ var FileItem = class {
 
         if (this._fileExtra == Enums.FileType.USER_DIRECTORY_TRASH) {
             let pixbuf = this._createEmblemedIcon(this._fileInfo.get_icon(), null);
-            this._icon.set_from_pixbuf(pixbuf);
-            this._dragSource.drag_source_set_icon_pixbuf(pixbuf);
+            const scale = this._icon.get_scale_factor();
+            let surface = Gdk.cairo_surface_create_from_pixbuf(pixbuf, scale, null);
+            this._icon.set_from_surface(surface);
             return;
         }
         let icon_set = false;
@@ -459,7 +552,10 @@ var FileItem = class {
                 } catch (error) {
                     if (!error.matches(Gio.IOErrorEnum, Gio.IOErrorEnum.CANCELLED)) {
                         print('Error while loading thumbnail: ' + error);
-                        this._icon.set_from_pixbuf(this._createEmblemedIcon(this._fileInfo.get_icon(), null));
+                        let pixbuf = this._createEmblemedIcon(this._fileInfo.get_icon());
+                        const scale = this._icon.get_scale_factor();
+                        let surface = Gdk.cairo_surface_create_from_pixbuf(pixbuf, scale, null);
+                        this._icon.set_from_surface(surface);
                     }
                 }
             }
@@ -476,8 +572,9 @@ var FileItem = class {
                     pixbuf = this._createEmblemedIcon(this._getDefaultIcon(), null);
                 }
             }
-            this._icon.set_from_pixbuf(pixbuf);
-            this._dragSource.drag_source_set_icon_pixbuf(pixbuf);
+            const scale = this._icon.get_scale_factor();
+            let surface = Gdk.cairo_surface_create_from_pixbuf(pixbuf, scale, null);
+            this._icon.set_from_surface(surface);
         }
     }
 
@@ -495,17 +592,21 @@ var FileItem = class {
         let thumbnailPixbuf = GdkPixbuf.Pixbuf.new_from_stream(thumbnailStream, null);
 
         if (thumbnailPixbuf != null) {
-            let width = Prefs.get_desired_width();
-            let height = Prefs.get_icon_size();
+            let width = Prefs.get_desired_width() - 8;
+            let height = Prefs.get_icon_size() - 8;
             let aspectRatio = thumbnailPixbuf.width / thumbnailPixbuf.height;
             if ((width / height) > aspectRatio)
                 width = height * aspectRatio;
             else
                 height = width / aspectRatio;
+            const scale = this._icon.get_scale_factor();
+            width *= scale;
+            height *= scale;
             let pixbuf = thumbnailPixbuf.scale_simple(Math.floor(width), Math.floor(height), GdkPixbuf.InterpType.BILINEAR);
             pixbuf = this._addEmblemsToPixbufIfNeeded(pixbuf);
-            this._icon.set_from_pixbuf(pixbuf);
-            this._dragSource.drag_source_set_icon_pixbuf(pixbuf);
+            let surface = Gdk.cairo_surface_create_from_pixbuf(pixbuf, scale, null);
+            this._icon.set_from_surface(surface);
+            this._icon.set_padding(4,4)
             return true;
         }
         return false;
@@ -540,9 +641,10 @@ var FileItem = class {
     }
 
     _addEmblemsToPixbufIfNeeded(pixbuf) {
+        const scale = this._icon.get_scale_factor();
         this._copiedPixbuf = false;
         let emblem = null;
-        let finalSize = Math.floor(Prefs.get_icon_size() / 3);
+        let finalSize = Math.floor(Prefs.get_icon_size() / 3) * scale;
         if (this._isSymlink) {
             if (this._isBrokenSymlink)
                 emblem = Gio.ThemedIcon.new('emblem-unreadable');
@@ -550,7 +652,7 @@ var FileItem = class {
                 emblem = Gio.ThemedIcon.new('emblem-symbolic-link');
             pixbuf = this._copyAndResizeIfNeeded(pixbuf);
             let theme = Gtk.IconTheme.get_default();
-            let emblemIcon = theme.lookup_by_gicon(emblem, finalSize, Gtk.IconLookupFlags.FORCE_SIZE).load_icon();
+            let emblemIcon = theme.lookup_by_gicon_for_scale(emblem, finalSize / scale, scale, Gtk.IconLookupFlags.FORCE_SIZE).load_icon();
             emblemIcon.composite(pixbuf, pixbuf.width - finalSize, pixbuf.height - finalSize, finalSize, finalSize, pixbuf.width - finalSize, pixbuf.height - finalSize, 1, 1, GdkPixbuf.InterpType.BILINEAR, 255);
         }
 
@@ -558,7 +660,7 @@ var FileItem = class {
             pixbuf = this._copyAndResizeIfNeeded(pixbuf);
             let theme = Gtk.IconTheme.get_default();
             emblem = Gio.ThemedIcon.new('emblem-default');
-            let emblemIcon = theme.lookup_by_gicon(emblem, finalSize, Gtk.IconLookupFlags.FORCE_SIZE).load_icon();
+            let emblemIcon = theme.lookup_by_gicon_for_scale(emblem, finalSize / scale, scale, Gtk.IconLookupFlags.FORCE_SIZE).load_icon();
             emblemIcon.composite(pixbuf, 0, 0, finalSize, finalSize, 0, 0, 1, 1, GdkPixbuf.InterpType.BILINEAR, 255);
         }
         return pixbuf;
@@ -606,11 +708,12 @@ var FileItem = class {
         }
         let theme = Gtk.IconTheme.get_default();
 
+        const scale = this._icon.get_scale_factor();
         let itemIcon = null;
         try {
-            itemIcon = theme.lookup_by_gicon(icon, Prefs.get_icon_size(), Gtk.IconLookupFlags.FORCE_SIZE).load_icon();
+            itemIcon = theme.lookup_by_gicon_for_scale(icon, Prefs.get_icon_size(), scale, Gtk.IconLookupFlags.FORCE_SIZE).load_icon();
         } catch (e) {
-            itemIcon = theme.load_icon("text-x-generic", Prefs.get_icon_size(), Gtk.IconLookupFlags.FORCE_SIZE);
+            itemIcon = theme.load_icon_for_scale("text-x-generic", Prefs.get_icon_size(), scale, Gtk.IconLookupFlags.FORCE_SIZE);
         }
 
         itemIcon = this._addEmblemsToPixbufIfNeeded(itemIcon);
@@ -866,6 +969,14 @@ var FileItem = class {
         }
         this._menu.add(new Gtk.SeparatorMenuItem());
         if ( (! this._desktopManager.checkIfSpecialFilesAreSelected()) && (this._selectedItemsNum >= 1 )) {
+            if (this._selectedItemsNum == 1 && this._desktopManager.getExtractable()) {
+                let extractFileHereFromSelection = new Gtk.MenuItem({label:  _("Extract Here")});
+                extractFileHereFromSelection.connect('activate', () => {this._desktopManager.extractFileFromSelection(true);});
+                this._menu.add(extractFileHereFromSelection);
+                let extractFileToFromSelection  = new Gtk.MenuItem({label:  _("Extract To...")});
+                extractFileToFromSelection.connect('activate', () => {this._desktopManager.extractFileFromSelection();});
+                this._menu.add(extractFileToFromSelection);
+            }
             if (! this._isDirectory) {
                 let mailFilesFromSelection = new Gtk.MenuItem({label: _('Send to...')});
                 mailFilesFromSelection.connect('activate', () => {this._desktopManager.mailFilesFromSelection();});
@@ -879,7 +990,6 @@ var FileItem = class {
             this._menu.add(newFolderFromSelection);
             this._menu.add(new Gtk.SeparatorMenuItem());
         }
-        this._menu.add(new Gtk.SeparatorMenuItem());
         let properties = new Gtk.MenuItem({label: this._selectedItemsNum > 1 ? _('Common Properties') : _('Properties') });
         properties.connect('activate', () => this._onPropertiesClicked());
         this._menu.add(properties);
@@ -899,7 +1009,25 @@ var FileItem = class {
         DesktopIconsUtil.launchTerminal(this.file.get_path(), null);
     }
 
+    _updateClickState(event) {
+        let settings = Gtk.Settings.get_default();
+
+        if ((event.get_button()[1] == this._lastClickButton) &&
+            ((event.get_time() - this._lastClickTime) < settings.gtk_double_click_time))
+            this._clickCount++;
+        else
+            this._clickCount = 1;
+
+        this._lastClickTime = event.get_time();
+        this._lastClickButton = event.get_button()[1];
+    }
+
+    _getClickCount() {
+        return this._clickCount;
+    }
+
     _onPressButton(actor, event) {
+        this._updateClickState(event);
         let button = event.get_button()[1];
         if (button == 3) {
             if (!this._isSelected) {
@@ -919,7 +1047,7 @@ var FileItem = class {
             if (this._actionTrash)
                 this._actionTrash.set_sensitive(!allowCutCopyTrash);
         } else if (button == 1) {
-            if (event.get_event_type() == Gdk.EventType.BUTTON_PRESS) {
+            if (this._getClickCount() == 1) {
                 let [a, x, y] = event.get_coords();
                 let state = event.get_state()[1];
                 this._primaryButtonPressed = true;
@@ -933,7 +1061,7 @@ var FileItem = class {
                     this._desktopManager.selected(this, Enums.Selection.ALONE);
                 }
             }
-            if ((event.get_event_type() == Gdk.EventType.DOUBLE_BUTTON_PRESS) && !Prefs.CLICK_POLICY_SINGLE) {
+            if (this._getClickCount() == 2 && !Prefs.CLICK_POLICY_SINGLE) {
                 this.doOpen();
             }
         }
@@ -944,9 +1072,11 @@ var FileItem = class {
     _setSelectedStatus() {
         if (this._isSelected && !this._styleContext.has_class('desktop-icons-selected')) {
             this._styleContext.add_class('desktop-icons-selected');
+            this._labelStyleContext.add_class('desktop-icons-selected');
         }
         if (!this._isSelected && this._styleContext.has_class('desktop-icons-selected')) {
             this._styleContext.remove_class('desktop-icons-selected');
+            this._labelStyleContext.remove_class('desktop-icons-selected');
         }
     }
 
@@ -976,6 +1106,11 @@ var FileItem = class {
     get isDrive() {
         return this._fileExtra == Enums.FileType.EXTERNAL_DRIVE;
     }
+
+    get isTrash() {
+        return this._fileExtra === Enums.FileType.USER_DIRECTORY_TRASH;
+    }
+
     _onReleaseButton(actor, event) {
         let button = event.get_button()[1];
         if (button == 1) {
@@ -999,6 +1134,7 @@ var FileItem = class {
     _onEnter(actor, event) {
         if (!this._styleContext.has_class('file-item-hover')) {
             this._styleContext.add_class('file-item-hover');
+            this._labelStyleContext.add_class('file-item-hover');
         }
         if (Prefs.CLICK_POLICY_SINGLE) {
             let window = this._eventBox.get_window();
@@ -1013,6 +1149,7 @@ var FileItem = class {
         this._primaryButtonPressed = false;
         if (this._styleContext.has_class('file-item-hover')) {
             this._styleContext.remove_class('file-item-hover');
+            this._labelStyleContext.remove_class('file-item-hover');
         }
         if (Prefs.CLICK_POLICY_SINGLE) {
             let window = this._eventBox.get_window();
@@ -1021,26 +1158,6 @@ var FileItem = class {
             }
         }
         return false;
-    }
-
-    startRubberband() {
-        this._rubberband = true;
-        this._touchedByRubberband = false;
-    }
-
-    endRubberband() {
-        this._rubberband = false;
-    }
-
-    updateRubberband(x1, y1, x2, y2) {
-        if ((x2 < this._x1) || (x1 > this._x2) || (y2 < this._y1) || (y1 > this._y2)) {
-            if (this._touchedByRubberband) {
-                this.unsetSelected();
-            }
-        } else {
-            this.setSelected();
-            this._touchedByRubberband = true;
-        }
     }
 
     get savedCoordinates() {
@@ -1124,10 +1241,14 @@ var FileItem = class {
     }
 
     get displayName() {
-        if (this.trustedDesktopFile)
+        if (this.trustedDesktopFile) {
             return this._desktopFile.get_name();
-
+        }
         return this._displayName || null;
+    }
+
+    get fileSize() {
+        return this._fileInfo.get_size();
     }
 
 };

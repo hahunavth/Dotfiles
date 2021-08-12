@@ -8,6 +8,10 @@
     </columns>
     <data>
       <row>
+        <col id="0" translatable="yes">Disable</col>
+        <col id="1">disable</col>
+      </row>
+      <row>
         <col id="0" translatable="yes">Linear tweening</col>
         <col id="1">linear</col>
       </row>
@@ -439,6 +443,12 @@
         <col id="3">0</col>
       </row>
       <row>
+        <col id="0">shortcut-toggle-transparent-background</col>
+        <col id="1" translatable="yes">Enable/Disable Background Transparency</col>
+        <col id="2">0</col>
+        <col id="3">0</col>
+      </row>
+      <row>
         <col id="0">shortcut-terminal-copy</col>
         <col id="1" translatable="yes">Copy Selected Text</col>
         <col id="2">0</col>
@@ -621,38 +631,13 @@
                 <property name="row-spacing">10</property>
                 <property name="column-spacing">10</property>
                 <child>
-                  <object class="GtkLabel">
-                    <property name="halign">start</property>
-                    <property name="label" translatable="yes">Theme _variant:</property>
-                    <property name="use-underline">1</property>
-                    <property name="mnemonic-widget">theme_variant_combo</property>
-                    <layout>
-                      <property name="column">0</property>
-                      <property name="row">0</property>
-                    </layout>
-                  </object>
-                </child>
-                <child>
-                  <object class="GtkComboBoxText" id="theme_variant_combo">
-                    <items>
-                      <item id="system" translatable="yes">Default</item>
-                      <item id="light" translatable="yes">Light</item>
-                      <item id="dark" translatable="yes">Dark</item>
-                    </items>
-                    <layout>
-                      <property name="column">1</property>
-                      <property name="row">0</property>
-                    </layout>
-                  </object>
-                </child>
-                <child>
                   <object class="GtkCheckButton" id="window_above_check">
                     <property name="label" translatable="yes">_Above all windows</property>
                     <property name="action-name">settings.window-above</property>
                     <property name="use-underline">1</property>
                     <layout>
                       <property name="column">0</property>
-                      <property name="row">5</property>
+                      <property name="row">7</property>
                       <property name="column-span">2</property>
                     </layout>
                   </object>
@@ -664,34 +649,8 @@
                     <property name="use-underline">1</property>
                     <layout>
                       <property name="column">0</property>
-                      <property name="row">6</property>
+                      <property name="row">8</property>
                       <property name="column-span">2</property>
-                    </layout>
-                  </object>
-                </child>
-                <child>
-                  <object class="GtkLabel">
-                    <property name="halign">start</property>
-                    <property name="label" translatable="yes">_Background opacity:</property>
-                    <property name="use-underline">1</property>
-                    <property name="mnemonic-widget">opacity_scale</property>
-                    <layout>
-                      <property name="column">0</property>
-                      <property name="row">1</property>
-                    </layout>
-                  </object>
-                </child>
-                <child>
-                  <object class="GtkScale" id="opacity_scale">
-                    <property name="draw-value">1</property>
-                    <property name="width-request">200</property>
-                    <property name="adjustment">opacity_adjustment</property>
-                    <property name="show-fill-level">1</property>
-                    <property name="round-digits">2</property>
-                    <property name="digits">2</property>
-                    <layout>
-                      <property name="column">1</property>
-                      <property name="row">1</property>
                     </layout>
                   </object>
                 </child>
@@ -702,7 +661,7 @@
                     <property name="use-underline">1</property>
                     <layout>
                       <property name="column">0</property>
-                      <property name="row">9</property>
+                      <property name="row">11</property>
                       <property name="column-span">2</property>
                     </layout>
                   </object>
@@ -714,7 +673,7 @@
                     <property name="use-underline">1</property>
                     <layout>
                       <property name="column">0</property>
-                      <property name="row">7</property>
+                      <property name="row">9</property>
                       <property name="column-span">2</property>
                     </layout>
                   </object>
@@ -726,7 +685,7 @@
                     <property name="use-underline">1</property>
                     <layout>
                       <property name="column">0</property>
-                      <property name="row">8</property>
+                      <property name="row">10</property>
                       <property name="column-span">2</property>
                     </layout>
                   </object>
@@ -738,7 +697,7 @@
                     <property name="use-underline">1</property>
                     <layout>
                       <property name="column">0</property>
-                      <property name="row">13</property>
+                      <property name="row">15</property>
                       <property name="column-span">2</property>
                     </layout>
                   </object>
@@ -751,7 +710,7 @@ You&apos;ll have to close all tabs for this option to take effect.</property>
                     <property name="use-underline">1</property>
                     <layout>
                       <property name="column">0</property>
-                      <property name="row">14</property>
+                      <property name="row">16</property>
                       <property name="column-span">2</property>
                     </layout>
                   </object>
@@ -764,7 +723,7 @@ You&apos;ll have to close all tabs for this option to take effect.</property>
                     <property name="mnemonic-widget">window_type_hint_combo</property>
                     <layout>
                       <property name="column">0</property>
-                      <property name="row">15</property>
+                      <property name="row">17</property>
                     </layout>
                   </object>
                 </child>
@@ -773,20 +732,20 @@ You&apos;ll have to close all tabs for this option to take effect.</property>
                     <items>
                       <item id="normal" translatable="yes">Normal</item>
                       <item id="dialog" translatable="yes">Dialog</item>
-                      <item id="splashscreen" translatable="yes">Splash Screen</item>
+                      <item id="splashscreen" translatable="yes">Splash screen</item>
                       <item id="utility" translatable="yes">Utility</item>
                       <item id="dock" translatable="yes">Dock</item>
-                      <item id="dropdown-menu" translatable="yes">Dropdown Menu</item>
+                      <item id="dropdown-menu" translatable="yes">Dropdown menu</item>
                       <item id="menu" translatable="yes">Menu</item>
                       <item id="toolbar" translatable="yes">Toolbar</item>
-                      <item id="popup-menu" translatable="yes">Popup Menu</item>
+                      <item id="popup-menu" translatable="yes">Popup menu</item>
                       <item id="tooltip" translatable="yes">Tooltip</item>
                       <item id="notification" translatable="yes">Notification</item>
                       <item id="combo" translatable="yes">Combo</item>
                     </items>
                     <layout>
                       <property name="column">1</property>
-                      <property name="row">15</property>
+                      <property name="row">17</property>
                     </layout>
                   </object>
                 </child>
@@ -798,7 +757,7 @@ You&apos;ll have to close all tabs for this option to take effect.</property>
                     <property name="mnemonic-widget">window_size_scale</property>
                     <layout>
                       <property name="column">0</property>
-                      <property name="row">3</property>
+                      <property name="row">5</property>
                     </layout>
                   </object>
                 </child>
@@ -811,7 +770,7 @@ You&apos;ll have to close all tabs for this option to take effect.</property>
                     <property name="digits">2</property>
                     <layout>
                       <property name="column">1</property>
-                      <property name="row">3</property>
+                      <property name="row">5</property>
                     </layout>
                   </object>
                 </child>
@@ -822,7 +781,7 @@ You&apos;ll have to close all tabs for this option to take effect.</property>
                     <property name="use-underline">1</property>
                     <layout>
                       <property name="column">0</property>
-                      <property name="row">4</property>
+                      <property name="row">6</property>
                       <property name="column-span">2</property>
                     </layout>
                   </object>
@@ -833,7 +792,7 @@ You&apos;ll have to close all tabs for this option to take effect.</property>
                     <property name="action-name">settings.override-window-animation</property>
                     <layout>
                       <property name="column">0</property>
-                      <property name="row">10</property>
+                      <property name="row">12</property>
                       <property name="column-span">2</property>
                     </layout>
                   </object>
@@ -844,7 +803,7 @@ You&apos;ll have to close all tabs for this option to take effect.</property>
                     <property name="label" translatable="yes">Show animation:</property>
                     <layout>
                       <property name="column">0</property>
-                      <property name="row">11</property>
+                      <property name="row">13</property>
                     </layout>
                   </object>
                 </child>
@@ -854,7 +813,7 @@ You&apos;ll have to close all tabs for this option to take effect.</property>
                     <property name="label" translatable="yes">Hide animation:</property>
                     <layout>
                       <property name="column">0</property>
-                      <property name="row">12</property>
+                      <property name="row">14</property>
                     </layout>
                   </object>
                 </child>
@@ -875,7 +834,7 @@ You&apos;ll have to close all tabs for this option to take effect.</property>
                     </child>
                     <layout>
                       <property name="column">1</property>
-                      <property name="row">11</property>
+                      <property name="row">13</property>
                     </layout>
                   </object>
                 </child>
@@ -896,7 +855,7 @@ You&apos;ll have to close all tabs for this option to take effect.</property>
                     </child>
                     <layout>
                       <property name="column">1</property>
-                      <property name="row">12</property>
+                      <property name="row">14</property>
                     </layout>
                   </object>
                 </child>
@@ -906,7 +865,7 @@ You&apos;ll have to close all tabs for this option to take effect.</property>
                     <property name="label" translatable="yes">Window position:</property>
                     <layout>
                       <property name="column">0</property>
-                      <property name="row">2</property>
+                      <property name="row">4</property>
                     </layout>
                   </object>
                 </child>
@@ -920,7 +879,61 @@ You&apos;ll have to close all tabs for this option to take effect.</property>
                     </items>
                     <layout>
                       <property name="column">1</property>
+                      <property name="row">4</property>
+                    </layout>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkCheckButton" id="window_monitor_current_radio">
+                    <property name="label" translatable="yes">On the monitor that contains the mouse pointer</property>
+                    <layout>
+                      <property name="column">0</property>
+                      <property name="row">0</property>
+                      <property name="column-span">2</property>
+                    </layout>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkCheckButton" id="window_monitor_primary_radio">
+                    <property name="label" translatable="yes">On the primary monitor</property>
+                    <property name="group">window_monitor_current_radio</property>
+                    <layout>
+                      <property name="column">0</property>
+                      <property name="row">1</property>
+                      <property name="column-span">2</property>
+                    </layout>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkCheckButton" id="window_monitor_focus_radio">
+                    <property name="label" translatable="yes">On the monitor with keyboard focus</property>
+                    <property name="group">window_monitor_current_radio</property>
+                    <layout>
+                      <property name="column">0</property>
                       <property name="row">2</property>
+                      <property name="column-span">2</property>
+                    </layout>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkCheckButton" id="window_monitor_connector_radio">
+                    <property name="label" translatable="yes">On monitor:</property>
+                    <property name="group">window_monitor_current_radio</property>
+                    <layout>
+                      <property name="column">0</property>
+                      <property name="row">3</property>
+                    </layout>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkBox">
+                    <property name="orientation">vertical</property>
+                    <child>
+                      <object class="GtkComboBoxText" id="monitor_combo"/>
+                    </child>
+                    <layout>
+                      <property name="column">1</property>
+                      <property name="row">3</property>
                     </layout>
                   </object>
                 </child>
@@ -1337,13 +1350,38 @@ Following helpers are available:
                 <property name="row-spacing">10</property>
                 <property name="column-spacing">10</property>
                 <child>
+                  <object class="GtkLabel">
+                    <property name="halign">start</property>
+                    <property name="label" translatable="yes">Theme _variant:</property>
+                    <property name="use-underline">1</property>
+                    <property name="mnemonic-widget">theme_variant_combo</property>
+                    <layout>
+                      <property name="column">0</property>
+                      <property name="row">0</property>
+                    </layout>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkComboBoxText" id="theme_variant_combo">
+                    <items>
+                      <item id="system" translatable="yes">Default</item>
+                      <item id="light" translatable="yes">Light</item>
+                      <item id="dark" translatable="yes">Dark</item>
+                    </items>
+                    <layout>
+                      <property name="column">1</property>
+                      <property name="row">0</property>
+                    </layout>
+                  </object>
+                </child>
+                <child>
                   <object class="GtkCheckButton" id="theme_colors_check">
                     <property name="label" translatable="yes">Use colors from system _theme</property>
                     <property name="action-name">settings.use-theme-colors</property>
                     <property name="use-underline">1</property>
                     <layout>
                       <property name="column">0</property>
-                      <property name="row">0</property>
+                      <property name="row">1</property>
                       <property name="column-span">2</property>
                     </layout>
                   </object>
@@ -1548,8 +1586,38 @@ Following helpers are available:
                     </child>
                     <layout>
                       <property name="column">0</property>
-                      <property name="row">1</property>
+                      <property name="row">2</property>
                       <property name="column-span">2</property>
+                    </layout>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkCheckButton">
+                    <property name="label" translatable="yes">_Background opacity:</property>
+                    <property name="action-name">settings.transparent-background</property>
+                    <property name="use-underline">1</property>
+                    <layout>
+                      <property name="column">0</property>
+                      <property name="row">3</property>
+                    </layout>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkBox">
+                    <child>
+                      <object class="GtkScale" id="opacity_scale">
+                        <property name="hexpand">1</property>
+                        <property name="draw-value">1</property>
+                        <property name="width-request">200</property>
+                        <property name="adjustment">opacity_adjustment</property>
+                        <property name="show-fill-level">1</property>
+                        <property name="round-digits">2</property>
+                        <property name="digits">2</property>
+                      </object>
+                    </child>
+                    <layout>
+                      <property name="column">1</property>
+                      <property name="row">3</property>
                     </layout>
                   </object>
                 </child>
@@ -1561,7 +1629,7 @@ Following helpers are available:
                     <property name="mnemonic-widget">palette_combo</property>
                     <layout>
                       <property name="column">0</property>
-                      <property name="row">2</property>
+                      <property name="row">4</property>
                     </layout>
                   </object>
                 </child>
@@ -1576,7 +1644,7 @@ Following helpers are available:
                     </child>
                     <layout>
                       <property name="column">1</property>
-                      <property name="row">2</property>
+                      <property name="row">4</property>
                     </layout>
                   </object>
                 </child>
@@ -1764,7 +1832,7 @@ Following helpers are available:
                     </child>
                     <layout>
                       <property name="column">0</property>
-                      <property name="row">3</property>
+                      <property name="row">5</property>
                       <property name="column-span">2</property>
                     </layout>
                   </object>
@@ -1776,7 +1844,7 @@ Following helpers are available:
                     <property name="use-underline">1</property>
                     <layout>
                       <property name="column">0</property>
-                      <property name="row">4</property>
+                      <property name="row">6</property>
                       <property name="column-span">2</property>
                     </layout>
                   </object>
@@ -1799,8 +1867,6 @@ Following helpers are available:
                 <child>
                   <object class="GtkCheckButton" id="spawn_user_shell">
                     <property name="label" translatable="yes">User _shell</property>
-                    <property name="action-name">settings.command</property>
-                    <property name="action-target">&apos;user-shell&apos;</property>
                     <property name="use-underline">1</property>
                     <layout>
                       <property name="column">0</property>
@@ -1810,10 +1876,8 @@ Following helpers are available:
                   </object>
                 </child>
                 <child>
-                  <object class="GtkCheckButton">
+                  <object class="GtkCheckButton" id="spawn_user_shell_login">
                     <property name="label" translatable="yes">User shell as _login shell</property>
-                    <property name="action-name">settings.command</property>
-                    <property name="action-target">&apos;user-shell-login&apos;</property>
                     <property name="use-underline">1</property>
                     <property name="group">spawn_user_shell</property>
                     <layout>
@@ -1826,8 +1890,6 @@ Following helpers are available:
                 <child>
                   <object class="GtkCheckButton" id="spawn_custom_command">
                     <property name="label" translatable="yes">Custom _command:</property>
-                    <property name="action-name">settings.command</property>
-                    <property name="action-target">&apos;custom-command&apos;</property>
                     <property name="use-underline">1</property>
                     <property name="group">spawn_user_shell</property>
                     <layout>
@@ -2181,8 +2243,8 @@ Following helpers are available:
                   <object class="GtkComboBoxText" id="panel_icon_type_combo">
                     <items>
                       <item id="none" translatable="yes">None</item>
-                      <item id="menu-button" translatable="yes">With Popup Menu</item>
-                      <item id="toggle-button" translatable="yes">Toggle Button</item>
+                      <item id="menu-button" translatable="yes">With popup menu</item>
+                      <item id="toggle-button" translatable="yes">Toggle button</item>
                     </items>
                     <layout>
                       <property name="column">1</property>

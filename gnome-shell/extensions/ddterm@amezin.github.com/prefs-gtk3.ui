@@ -33,6 +33,10 @@ along with ddterm GNOME Shell extension.  If not, see <http://www.gnu.org/licens
     </columns>
     <data>
       <row>
+        <col id="0" translatable="yes">Disable</col>
+        <col id="1">disable</col>
+      </row>
+      <row>
         <col id="0" translatable="yes">Linear tweening</col>
         <col id="1">linear</col>
       </row>
@@ -494,6 +498,12 @@ along with ddterm GNOME Shell extension.  If not, see <http://www.gnu.org/licens
         <col id="3">0</col>
       </row>
       <row>
+        <col id="0">shortcut-toggle-transparent-background</col>
+        <col id="1" translatable="yes">Enable/Disable Background Transparency</col>
+        <col id="2">0</col>
+        <col id="3">0</col>
+      </row>
+      <row>
         <col id="0">shortcut-terminal-copy</col>
         <col id="1" translatable="yes">Copy Selected Text</col>
         <col id="2">0</col>
@@ -675,7 +685,7 @@ along with ddterm GNOME Shell extension.  If not, see <http://www.gnu.org/licens
       <object class="GtkStack" id="stack">
         <property name="visible">1</property>
         <property name="can-focus">1</property>
-        <!-- n-columns=2 n-rows=16 -->
+        <!-- n-columns=2 n-rows=18 -->
         <child>
           <object class="GtkGrid">
             <property name="visible">1</property>
@@ -687,34 +697,6 @@ along with ddterm GNOME Shell extension.  If not, see <http://www.gnu.org/licens
             <property name="row-spacing">10</property>
             <property name="column-spacing">10</property>
             <child>
-              <object class="GtkLabel">
-                <property name="visible">1</property>
-                <property name="halign">start</property>
-                <property name="label" translatable="yes">Theme _variant:</property>
-                <property name="use-underline">1</property>
-                <property name="mnemonic-widget">theme_variant_combo</property>
-              </object>
-              <packing>
-                <property name="left-attach">0</property>
-                <property name="top-attach">0</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkComboBoxText" id="theme_variant_combo">
-                <property name="visible">1</property>
-                <property name="can-focus">1</property>
-                <items>
-                  <item id="system" translatable="yes">Default</item>
-                  <item id="light" translatable="yes">Light</item>
-                  <item id="dark" translatable="yes">Dark</item>
-                </items>
-              </object>
-              <packing>
-                <property name="left-attach">1</property>
-                <property name="top-attach">0</property>
-              </packing>
-            </child>
-            <child>
               <object class="GtkCheckButton" id="window_above_check">
                 <property name="label" translatable="yes">_Above all windows</property>
                 <property name="visible">1</property>
@@ -725,7 +707,7 @@ along with ddterm GNOME Shell extension.  If not, see <http://www.gnu.org/licens
               </object>
               <packing>
                 <property name="left-attach">0</property>
-                <property name="top-attach">5</property>
+                <property name="top-attach">7</property>
                 <property name="width">2</property>
               </packing>
             </child>
@@ -740,36 +722,8 @@ along with ddterm GNOME Shell extension.  If not, see <http://www.gnu.org/licens
               </object>
               <packing>
                 <property name="left-attach">0</property>
-                <property name="top-attach">6</property>
+                <property name="top-attach">8</property>
                 <property name="width">2</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkLabel">
-                <property name="visible">1</property>
-                <property name="halign">start</property>
-                <property name="label" translatable="yes">_Background opacity:</property>
-                <property name="use-underline">1</property>
-                <property name="mnemonic-widget">opacity_scale</property>
-              </object>
-              <packing>
-                <property name="left-attach">0</property>
-                <property name="top-attach">1</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkScale" id="opacity_scale">
-                <property name="width-request">200</property>
-                <property name="visible">1</property>
-                <property name="can-focus">1</property>
-                <property name="adjustment">opacity_adjustment</property>
-                <property name="show-fill-level">1</property>
-                <property name="round-digits">2</property>
-                <property name="digits">2</property>
-              </object>
-              <packing>
-                <property name="left-attach">1</property>
-                <property name="top-attach">1</property>
               </packing>
             </child>
             <child>
@@ -783,7 +737,7 @@ along with ddterm GNOME Shell extension.  If not, see <http://www.gnu.org/licens
               </object>
               <packing>
                 <property name="left-attach">0</property>
-                <property name="top-attach">9</property>
+                <property name="top-attach">11</property>
                 <property name="width">2</property>
               </packing>
             </child>
@@ -798,7 +752,7 @@ along with ddterm GNOME Shell extension.  If not, see <http://www.gnu.org/licens
               </object>
               <packing>
                 <property name="left-attach">0</property>
-                <property name="top-attach">7</property>
+                <property name="top-attach">9</property>
                 <property name="width">2</property>
               </packing>
             </child>
@@ -813,7 +767,7 @@ along with ddterm GNOME Shell extension.  If not, see <http://www.gnu.org/licens
               </object>
               <packing>
                 <property name="left-attach">0</property>
-                <property name="top-attach">8</property>
+                <property name="top-attach">10</property>
                 <property name="width">2</property>
               </packing>
             </child>
@@ -828,7 +782,7 @@ along with ddterm GNOME Shell extension.  If not, see <http://www.gnu.org/licens
               </object>
               <packing>
                 <property name="left-attach">0</property>
-                <property name="top-attach">13</property>
+                <property name="top-attach">15</property>
                 <property name="width">2</property>
               </packing>
             </child>
@@ -844,7 +798,7 @@ You&apos;ll have to close all tabs for this option to take effect.</property>
               </object>
               <packing>
                 <property name="left-attach">0</property>
-                <property name="top-attach">14</property>
+                <property name="top-attach">16</property>
                 <property name="width">2</property>
               </packing>
             </child>
@@ -858,7 +812,7 @@ You&apos;ll have to close all tabs for this option to take effect.</property>
               </object>
               <packing>
                 <property name="left-attach">0</property>
-                <property name="top-attach">15</property>
+                <property name="top-attach">17</property>
               </packing>
             </child>
             <child>
@@ -868,13 +822,13 @@ You&apos;ll have to close all tabs for this option to take effect.</property>
                 <items>
                   <item id="normal" translatable="yes">Normal</item>
                   <item id="dialog" translatable="yes">Dialog</item>
-                  <item id="splashscreen" translatable="yes">Splash Screen</item>
+                  <item id="splashscreen" translatable="yes">Splash screen</item>
                   <item id="utility" translatable="yes">Utility</item>
                   <item id="dock" translatable="yes">Dock</item>
-                  <item id="dropdown-menu" translatable="yes">Dropdown Menu</item>
+                  <item id="dropdown-menu" translatable="yes">Dropdown menu</item>
                   <item id="menu" translatable="yes">Menu</item>
                   <item id="toolbar" translatable="yes">Toolbar</item>
-                  <item id="popup-menu" translatable="yes">Popup Menu</item>
+                  <item id="popup-menu" translatable="yes">Popup menu</item>
                   <item id="tooltip" translatable="yes">Tooltip</item>
                   <item id="notification" translatable="yes">Notification</item>
                   <item id="combo" translatable="yes">Combo</item>
@@ -882,7 +836,7 @@ You&apos;ll have to close all tabs for this option to take effect.</property>
               </object>
               <packing>
                 <property name="left-attach">1</property>
-                <property name="top-attach">15</property>
+                <property name="top-attach">17</property>
               </packing>
             </child>
             <child>
@@ -895,7 +849,7 @@ You&apos;ll have to close all tabs for this option to take effect.</property>
               </object>
               <packing>
                 <property name="left-attach">0</property>
-                <property name="top-attach">3</property>
+                <property name="top-attach">5</property>
               </packing>
             </child>
             <child>
@@ -909,7 +863,7 @@ You&apos;ll have to close all tabs for this option to take effect.</property>
               </object>
               <packing>
                 <property name="left-attach">1</property>
-                <property name="top-attach">3</property>
+                <property name="top-attach">5</property>
               </packing>
             </child>
             <child>
@@ -923,7 +877,7 @@ You&apos;ll have to close all tabs for this option to take effect.</property>
               </object>
               <packing>
                 <property name="left-attach">0</property>
-                <property name="top-attach">4</property>
+                <property name="top-attach">6</property>
                 <property name="width">2</property>
               </packing>
             </child>
@@ -937,7 +891,7 @@ You&apos;ll have to close all tabs for this option to take effect.</property>
               </object>
               <packing>
                 <property name="left-attach">0</property>
-                <property name="top-attach">10</property>
+                <property name="top-attach">12</property>
                 <property name="width">2</property>
               </packing>
             </child>
@@ -949,7 +903,7 @@ You&apos;ll have to close all tabs for this option to take effect.</property>
               </object>
               <packing>
                 <property name="left-attach">0</property>
-                <property name="top-attach">11</property>
+                <property name="top-attach">13</property>
               </packing>
             </child>
             <child>
@@ -960,7 +914,7 @@ You&apos;ll have to close all tabs for this option to take effect.</property>
               </object>
               <packing>
                 <property name="left-attach">0</property>
-                <property name="top-attach">12</property>
+                <property name="top-attach">14</property>
               </packing>
             </child>
             <child>
@@ -983,7 +937,7 @@ You&apos;ll have to close all tabs for this option to take effect.</property>
               </object>
               <packing>
                 <property name="left-attach">1</property>
-                <property name="top-attach">11</property>
+                <property name="top-attach">13</property>
               </packing>
             </child>
             <child>
@@ -1006,7 +960,7 @@ You&apos;ll have to close all tabs for this option to take effect.</property>
               </object>
               <packing>
                 <property name="left-attach">1</property>
-                <property name="top-attach">12</property>
+                <property name="top-attach">14</property>
               </packing>
             </child>
             <child>
@@ -1017,7 +971,7 @@ You&apos;ll have to close all tabs for this option to take effect.</property>
               </object>
               <packing>
                 <property name="left-attach">0</property>
-                <property name="top-attach">2</property>
+                <property name="top-attach">4</property>
               </packing>
             </child>
             <child>
@@ -1032,7 +986,76 @@ You&apos;ll have to close all tabs for this option to take effect.</property>
               </object>
               <packing>
                 <property name="left-attach">1</property>
+                <property name="top-attach">4</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkRadioButton" id="window_monitor_current_radio">
+                <property name="label" translatable="yes">On the monitor that contains the mouse pointer</property>
+                <property name="visible">1</property>
+                <property name="can-focus">1</property>
+                <property name="draw-indicator">1</property>
+              </object>
+              <packing>
+                <property name="left-attach">0</property>
+                <property name="top-attach">0</property>
+                <property name="width">2</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkRadioButton" id="window_monitor_primary_radio">
+                <property name="label" translatable="yes">On the primary monitor</property>
+                <property name="visible">1</property>
+                <property name="can-focus">1</property>
+                <property name="draw-indicator">1</property>
+                <property name="group">window_monitor_current_radio</property>
+              </object>
+              <packing>
+                <property name="left-attach">0</property>
+                <property name="top-attach">1</property>
+                <property name="width">2</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkRadioButton" id="window_monitor_focus_radio">
+                <property name="label" translatable="yes">On the monitor with keyboard focus</property>
+                <property name="visible">1</property>
+                <property name="can-focus">1</property>
+                <property name="draw-indicator">1</property>
+                <property name="group">window_monitor_current_radio</property>
+              </object>
+              <packing>
+                <property name="left-attach">0</property>
                 <property name="top-attach">2</property>
+                <property name="width">2</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkRadioButton" id="window_monitor_connector_radio">
+                <property name="label" translatable="yes">On monitor:</property>
+                <property name="visible">1</property>
+                <property name="can-focus">1</property>
+                <property name="draw-indicator">1</property>
+                <property name="group">window_monitor_current_radio</property>
+              </object>
+              <packing>
+                <property name="left-attach">0</property>
+                <property name="top-attach">3</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkBox">
+                <property name="visible">1</property>
+                <property name="orientation">vertical</property>
+                <child>
+                  <object class="GtkComboBoxText" id="monitor_combo">
+                    <property name="visible">1</property>
+                  </object>
+                </child>
+              </object>
+              <packing>
+                <property name="left-attach">1</property>
+                <property name="top-attach">3</property>
               </packing>
             </child>
           </object>
@@ -1532,7 +1555,7 @@ Following helpers are available:
             <property name="position">2</property>
           </packing>
         </child>
-        <!-- n-columns=2 n-rows=5 -->
+        <!-- n-columns=2 n-rows=7 -->
         <child>
           <object class="GtkGrid">
             <property name="visible">1</property>
@@ -1544,6 +1567,34 @@ Following helpers are available:
             <property name="row-spacing">10</property>
             <property name="column-spacing">10</property>
             <child>
+              <object class="GtkLabel">
+                <property name="visible">1</property>
+                <property name="halign">start</property>
+                <property name="label" translatable="yes">Theme _variant:</property>
+                <property name="use-underline">1</property>
+                <property name="mnemonic-widget">theme_variant_combo</property>
+              </object>
+              <packing>
+                <property name="left-attach">0</property>
+                <property name="top-attach">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkComboBoxText" id="theme_variant_combo">
+                <property name="visible">1</property>
+                <property name="can-focus">1</property>
+                <items>
+                  <item id="system" translatable="yes">Default</item>
+                  <item id="light" translatable="yes">Light</item>
+                  <item id="dark" translatable="yes">Dark</item>
+                </items>
+              </object>
+              <packing>
+                <property name="left-attach">1</property>
+                <property name="top-attach">0</property>
+              </packing>
+            </child>
+            <child>
               <object class="GtkCheckButton" id="theme_colors_check">
                 <property name="label" translatable="yes">Use colors from system _theme</property>
                 <property name="visible">1</property>
@@ -1554,7 +1605,7 @@ Following helpers are available:
               </object>
               <packing>
                 <property name="left-attach">0</property>
-                <property name="top-attach">0</property>
+                <property name="top-attach">1</property>
                 <property name="width">2</property>
               </packing>
             </child>
@@ -1807,8 +1858,46 @@ Following helpers are available:
               </object>
               <packing>
                 <property name="left-attach">0</property>
-                <property name="top-attach">1</property>
+                <property name="top-attach">2</property>
                 <property name="width">2</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkCheckButton">
+                <property name="label" translatable="yes">_Background opacity:</property>
+                <property name="visible">1</property>
+                <property name="can-focus">1</property>
+                <property name="action-name">settings.transparent-background</property>
+                <property name="use-underline">1</property>
+                <property name="draw-indicator">1</property>
+              </object>
+              <packing>
+                <property name="left-attach">0</property>
+                <property name="top-attach">3</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkBox">
+                <property name="visible">1</property>
+                <property name="can-focus">1</property>
+                <child>
+                  <object class="GtkScale" id="opacity_scale">
+                    <property name="width-request">200</property>
+                    <property name="visible">1</property>
+                    <property name="can-focus">1</property>
+                    <property name="adjustment">opacity_adjustment</property>
+                    <property name="show-fill-level">1</property>
+                    <property name="round-digits">2</property>
+                    <property name="digits">2</property>
+                  </object>
+                  <packing>
+                    <property name="expand">1</property>
+                  </packing>
+                </child>
+              </object>
+              <packing>
+                <property name="left-attach">1</property>
+                <property name="top-attach">3</property>
               </packing>
             </child>
             <child>
@@ -1821,7 +1910,7 @@ Following helpers are available:
               </object>
               <packing>
                 <property name="left-attach">0</property>
-                <property name="top-attach">2</property>
+                <property name="top-attach">4</property>
               </packing>
             </child>
             <child>
@@ -1838,7 +1927,7 @@ Following helpers are available:
               </object>
               <packing>
                 <property name="left-attach">1</property>
-                <property name="top-attach">2</property>
+                <property name="top-attach">4</property>
               </packing>
             </child>
             <!-- n-columns=8 n-rows=2 -->
@@ -2061,7 +2150,7 @@ Following helpers are available:
               </object>
               <packing>
                 <property name="left-attach">0</property>
-                <property name="top-attach">3</property>
+                <property name="top-attach">5</property>
                 <property name="width">2</property>
               </packing>
             </child>
@@ -2076,7 +2165,7 @@ Following helpers are available:
               </object>
               <packing>
                 <property name="left-attach">0</property>
-                <property name="top-attach">4</property>
+                <property name="top-attach">6</property>
                 <property name="width">2</property>
               </packing>
             </child>
@@ -2102,8 +2191,6 @@ Following helpers are available:
                 <property name="label" translatable="yes">User _shell</property>
                 <property name="visible">1</property>
                 <property name="can-focus">1</property>
-                <property name="action-name">settings.command</property>
-                <property name="action-target">&apos;user-shell&apos;</property>
                 <property name="use-underline">1</property>
                 <property name="draw-indicator">1</property>
               </object>
@@ -2114,12 +2201,10 @@ Following helpers are available:
               </packing>
             </child>
             <child>
-              <object class="GtkRadioButton">
+              <object class="GtkRadioButton" id="spawn_user_shell_login">
                 <property name="label" translatable="yes">User shell as _login shell</property>
                 <property name="visible">1</property>
                 <property name="can-focus">1</property>
-                <property name="action-name">settings.command</property>
-                <property name="action-target">&apos;user-shell-login&apos;</property>
                 <property name="use-underline">1</property>
                 <property name="draw-indicator">1</property>
                 <property name="group">spawn_user_shell</property>
@@ -2135,8 +2220,6 @@ Following helpers are available:
                 <property name="label" translatable="yes">Custom _command:</property>
                 <property name="visible">1</property>
                 <property name="can-focus">1</property>
-                <property name="action-name">settings.command</property>
-                <property name="action-target">&apos;custom-command&apos;</property>
                 <property name="use-underline">1</property>
                 <property name="draw-indicator">1</property>
                 <property name="group">spawn_user_shell</property>
@@ -2558,8 +2641,8 @@ Following helpers are available:
                 <property name="visible">1</property>
                 <items>
                   <item id="none" translatable="yes">None</item>
-                  <item id="menu-button" translatable="yes">With Popup Menu</item>
-                  <item id="toggle-button" translatable="yes">Toggle Button</item>
+                  <item id="menu-button" translatable="yes">With popup menu</item>
+                  <item id="toggle-button" translatable="yes">Toggle button</item>
                 </items>
               </object>
               <packing>

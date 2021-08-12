@@ -13,6 +13,7 @@ const PluginBase = imports.service.plugin;
 
 var Metadata = {
     label: _('MPRIS'),
+    description: _('Bidirectional remote media playback control'),
     id: 'org.gnome.Shell.Extensions.GSConnect.Plugin.MPRIS',
     incomingCapabilities: ['kdeconnect.mpris', 'kdeconnect.mpris.request'],
     outgoingCapabilities: ['kdeconnect.mpris', 'kdeconnect.mpris.request'],
@@ -259,6 +260,15 @@ var Plugin = GObject.registerClass({
                     canGoNext: player.CanGoNext,
                     canGoPrevious: player.CanGoPrevious,
                     canSeek: player.CanSeek,
+
+                    // default values for members that will be filled conditionally
+                    albumArtUrl: '',
+                    length: 0,
+                    artist: '',
+                    title: '',
+                    album: '',
+                    nowPlaying: '',
+                    volume: 0,
                 });
 
                 const metadata = player.Metadata;
@@ -882,4 +892,3 @@ const PlayerRemote = GObject.registerClass({
         }
     }
 });
-

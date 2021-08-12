@@ -18,7 +18,7 @@
 
 var ICON_SIZE = { 'tiny': 36, 'small': 48, 'standard': 64, 'large': 96 };
 var ICON_WIDTH = { 'tiny': 70, 'small': 90, 'standard': 120, 'large': 130 };
-var ICON_HEIGHT = { 'tiny': 70, 'small': 90, 'standard': 106, 'large': 138 };
+var ICON_HEIGHT = { 'tiny': 80, 'small': 90, 'standard': 106, 'large': 138 };
 
 var START_CORNER = { 'top-left':     [false, false],
                      'top-right':    [true, false],
@@ -66,6 +66,15 @@ var WhatToDoWithExecutable = {
     EXECUTE_IN_TERMINAL: 1,
     DISPLAY: 2,
     CANCEL: 3
+};
+
+var SortOrder = {
+    ORDER: 'arrangeorder',
+    NAME: 'name',
+    DESCENDINGNAME: 'descendingname',
+    MODIFIEDTIME: 'modifiedtime',
+    KIND: 'kind',
+    SIZE: 'size'
 };
 
 var DEFAULT_ATTRIBUTES = 'metadata::*,standard::*,access::*,time::modified,unix::mode';

@@ -75,15 +75,13 @@ var AppWindow = GObject.registerClass(
             });
 
             this.method_handler(this.settings, 'changed::background-opacity', this.update_app_paintable);
+            this.method_handler(this.settings, 'changed::transparent-background', this.update_app_paintable);
             this.update_app_paintable();
 
             this.method_handler(this.notebook, 'page-removed', this.close_if_no_pages);
 
             this.toggle_action = this.simple_action('toggle', this.toggle.bind(this));
             this.hide_action = this.simple_action('hide', () => this.hide());
-            this.simple_action('toggle-maximize', () => {
-                this.settings.set_boolean('window-maximize', !this.settings.get_boolean('window-maximize'));
-            });
 
             this.simple_action('new-tab', this.insert_page.bind(this, -1));
             this.simple_action('new-tab-front', this.insert_page.bind(this, 0));
@@ -116,8 +114,22 @@ var AppWindow = GObject.registerClass(
             });
             this.add_action(this.tab_select_action);
 
-            this.simple_action('next-tab', () => this.notebook.next_page());
-            this.simple_action('prev-tab', () => this.notebook.prev_page());
+            this.simple_action('next-tab', () => {
+                const current = this.notebook.get_current_page();
+
+                if (current === this.notebook.get_n_pages() - 1)
+                    this.notebook.set_current_page(0);
+                else
+                    this.notebook.set_current_page(current + 1);
+            });
+            this.simple_action('prev-tab', () => {
+                const current = this.notebook.get_current_page();
+
+                if (current === 0)
+                    this.notebook.set_current_page(this.notebook.get_n_pages() - 1);
+                else
+                    this.notebook.set_current_page(current - 1);
+            });
 
             this.bind_settings_ro('new-tab-button', this.new_tab_button, 'visible');
             this.bind_settings_ro('new-tab-front-button', this.new_tab_front_button, 'visible');
@@ -245,7 +257,8 @@ var AppWindow = GObject.registerClass(
         }
 
         update_app_paintable() {
-            this.app_paintable = this.settings.get_double('background-opacity') < 1.0;
+            this.app_paintable = this.settings.get_boolean('transparent-background') &&
+                                 this.settings.get_double('background-opacity') < 1.0;
 
             if (this.app_paintable) {
                 if (this.draw_handler_id === null)

@@ -8,18 +8,18 @@ const Me = imports.misc.extensionUtils.getCurrentExtension();
 const Settings = Me.imports.settings;
 const Utils = Me.imports.utilities;
 const PaintSignals = Me.imports.paint_signals;
-let prefs = new Settings.Prefs;
 
 const default_sigma = 30;
 const default_brightness = 0.6;
 
 class DashInfos {
-    constructor(dash_blur, dash, dash_box, background_parent, effect) {
+    constructor(dash_blur, dash, dash_box, background_parent, effect, prefs) {
         this.dash_blur = dash_blur;
         this.dash = dash;
         this.dash_box = dash_box;
         this.background_parent = background_parent;
         this.effect = effect;
+        this.prefs = prefs;
 
         dash_blur.connections.connect(dash_blur, 'remove-dashes', () => {
             this._log("removing blur from dash");
@@ -45,14 +45,16 @@ class DashInfos {
     }
 
     _log(str) {
-        log(`[Blur my Shell] ${str}`)
+        if (this.prefs.DEBUG.get())
+            log(`[Blur my Shell] ${str}`)
     }
 }
 
 var DashBlur = class DashBlur {
-    constructor(connections) {
+    constructor(connections, prefs) {
         this.dashes = [];
         this.connections = connections;
+        this.prefs = prefs;
         this.paint_signals = new PaintSignals.PaintSignals(connections);
         this.sigma = default_sigma;
         this.brightness = default_brightness;
@@ -92,6 +94,20 @@ var DashBlur = class DashBlur {
         let dash = dash_container.get_child_at_index(0).get_child_at_index(0).get_child_at_index(0);
         let dash_box = dash.get_child_at_index(0);
 
+        var adjustment = 0;
+        switch (dash_container._position) {
+            case 0: // top, dash to dock 40 PR has a bug where has space on top
+                adjustment = 8;
+                break;
+            case 1: // right
+            case 3: // left
+                adjustment = 16;
+                break;
+            case 2: // bottom
+                adjustment = 0;
+                break;
+        }
+
         // the effect applied
         let effect = new Shell.BlurEffect({
             brightness: this.brightness,
@@ -112,7 +128,7 @@ var DashBlur = class DashBlur {
         let background = new St.Widget({
             style_class: 'dash-blurred-background',
             x: dash_box.x,
-            y: dash.height - dash_box.height - 8,
+            y: dash.height - dash_box.height - adjustment,
             width: dash_box.width,
             height: dash_box.height,
         });
@@ -121,7 +137,7 @@ var DashBlur = class DashBlur {
             background.height = dash_box.height;
             background.width = dash_box.width;
             background.x = dash_box.x;
-            background.y = dash.height - dash_box.height - 8;
+            background.y = dash.height - dash_box.height - adjustment;
         }, 100);
 
         let dash_icons_container = dash.get_child_at_index(1).get_child_at_index(0).get_child_at_index(2);
@@ -132,7 +148,7 @@ var DashBlur = class DashBlur {
             background.height = dash_box.height;
             background.width = dash_box.width;
             background.x = dash_box.x;
-            background.y = dash.height - dash_box.height - 8;
+            background.y = dash.height - dash_box.height - adjustment;
         });
 
         // HACK
@@ -142,7 +158,7 @@ var DashBlur = class DashBlur {
             // ! but it prevents the shadows of the dash buttons to cause artefacts on the dash itself
             // ! note: issue opened at https://gitlab.gnome.org/GNOME/gnome-shell/-/issues/2857
 
-            if (prefs.HACKS_LEVEL.get() == 1) {
+            if (this.prefs.HACKS_LEVEL.get() == 1) {
                 this._log("dash hack level 1");
                 this.paint_signals.disconnect_all();
 
@@ -179,7 +195,7 @@ var DashBlur = class DashBlur {
                 this.connections.connect(dash_show_apps, 'button-press-event', rp);
 
                 this.connections.connect(dash, 'leave-event', rp);
-            } else if (prefs.HACKS_LEVEL.get() == 2) {
+            } else if (this.prefs.HACKS_LEVEL.get() == 2) {
                 this._log("dash hack level 2");
 
                 this.paint_signals.connect(dash, this.effect);
@@ -205,7 +221,7 @@ var DashBlur = class DashBlur {
         }, 3000);
 
         // returns infos
-        return new DashInfos(this, dash, dash_box, background_parent, effect);
+        return new DashInfos(this, dash, dash_box, background_parent, effect, this.prefs);
     }
 
     set_sigma(sigma) {
@@ -221,7 +237,6 @@ var DashBlur = class DashBlur {
     disable() {
         this._log("removing blur from dashes");
 
-
         this.emit('remove-dashes', true);
 
         this.dashes = [];
@@ -236,7 +251,8 @@ var DashBlur = class DashBlur {
     }
 
     _log(str) {
-        log(`[Blur my Shell] ${str}`)
+        if (this.prefs.DEBUG.get())
+            log(`[Blur my Shell] ${str}`)
     }
 }
 

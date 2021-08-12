@@ -143,6 +143,9 @@ subtitle-1 {
     background: rgba(0, 0, 0, 0.12);
     color: #3f51b5; }
 
+.background-primary {
+  background: #3f51b5; }
+
 #msPanel {
   background: rgba(255, 255, 255, 0.876);
   box-shadow: 3px 3px 6px rgba(0, 0, 0, 0.4); }
@@ -286,6 +289,9 @@ MatTooltip {
   min-height: 24px;
   text-align: center; }
 
+MatDivider {
+  background: rgba(0, 0, 0, 0.04); }
+
 .surface {
   background: rgba(255, 255, 255, 0.987); }
 
@@ -300,7 +306,7 @@ MatTooltip {
   -arrow-base: 0px;
   -arrow-rise: 0px; }
 
-/* .no-theme { 
+/* .no-theme {
     .popup-menu {
         margin: 0;
         -boxpointer-gap: 0px;

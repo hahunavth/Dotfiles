@@ -178,6 +178,9 @@ subtitle-1 {
 .dark-primary.mat-button .mat-panel-button.active {
   color: rgba(255, 255, 255, 0.87); }
 
+.background-primary {
+  background: #3f51b5; }
+
 #msPanel {
   background: rgba(63, 81, 181, 0.876);
   box-shadow: 3px 3px 6px rgba(0, 0, 0, 0.4); }
@@ -357,6 +360,12 @@ MatTooltip {
   min-height: 24px;
   text-align: center; }
 
+.light-primaryMatDivider {
+  background: #2c397f; }
+
+.dark-primaryMatDivider {
+  background: #707ecd; }
+
 .surface {
   background: rgba(63, 81, 181, 0.987); }
 
@@ -371,7 +380,7 @@ MatTooltip {
   -arrow-base: 0px;
   -arrow-rise: 0px; }
 
-/* .no-theme { 
+/* .no-theme {
     .popup-menu {
         margin: 0;
         -boxpointer-gap: 0px;

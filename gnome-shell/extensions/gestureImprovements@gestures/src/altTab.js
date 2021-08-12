@@ -1,157 +1,156 @@
-'use strict';
-
-const { Clutter, GLib, Shell, St } = imports.gi;
+/* exported AltTabGestureExtension */
+const Clutter = imports.gi.Clutter;
+const GLib = imports.gi.GLib;
+const Shell = imports.gi.Shell;
+const St = imports.gi.St;
 
 const Main = imports.ui.main;
-const ExtensionUtils = imports.misc.extensionUtils;
-
 const { WindowSwitcherPopup } = imports.ui.altTab;
-const OverviewControlsState = imports.ui.overviewControls.ControlsState;
-const { TouchpadSwipeGesture } = ExtensionUtils.getCurrentExtension().imports.src.swipeTracker;
-
 const Me = imports.misc.extensionUtils.getCurrentExtension();
-const Constants = Me.imports.constants;
-const POPUP_SCROLL_TIME = 100; // milliseconds
-
+const { TouchpadSwipeGesture } = Me.imports.src.swipeTracker;
+const { AltTabConstants, ExtSettings } = Me.imports.constants;
+let dummyWinCount = AltTabConstants.DUMMY_WIN_COUNT;
+function getIndexForProgress(progress, nelement) {
+	let index = Math.floor(progress * (nelement + 2 * dummyWinCount));
+	index = index - dummyWinCount;
+	return Math.clamp(index, 0, nelement - 1);
+}
+// index -> index + AltTabConstants.DUMMY_WIN_COUNT
+function getAvgProgressForIndex(index, nelement) {
+	index = index + dummyWinCount;
+	const progress = (index + 0.5) / (nelement + 2 * dummyWinCount);
+	return progress;
+}
 const AltTabExtState = {
 	DISABLED: 0,
 	DEFAULT: 1,
 	ALTTABDELAY: 2,
 	ALTTAB: 3,
-	OVERVIEWTAB: 4
 };
-
 var AltTabGestureExtension = class AltTabGestureExtension {
 	constructor() {
-		this._connectHandlers = [];
-		this._touchpadSwipeTracker = null;
-		this._adjustment = null;
-		this._switcher = null;
-		this._workspaceContainerLayout = null;
-		this._windowPreview = null;
 		this._extState = AltTabExtState.DISABLED;
-	}
-
-	enable() {
-		this._touchpadSwipeTracker = new TouchpadSwipeGesture(
-			[3],
-			Shell.ActionMode.ALL,
-			Clutter.Orientation.HORIZONTAL,
-			false,
-			this);
-
+		this._progress = 0;
+		this._altTabTimeoutId = 0;
+		this._connectHandlers = [];
+		this._touchpadSwipeTracker = new TouchpadSwipeGesture((ExtSettings.DEFAULT_SESSION_WORKSPACE_GESTURE ? [4] : [3]), Shell.ActionMode.ALL, Clutter.Orientation.HORIZONTAL, false, this._checkAllowedGesture.bind(this));
 		this._adjustment = new St.Adjustment({
 			value: 0,
 			lower: 0,
 			upper: 1,
 		});
+	}
+	_checkAllowedGesture() {
+		return this._extState <= AltTabExtState.DEFAULT && Main.actionMode === Shell.ActionMode.NORMAL;
+	}
+	apply() {
 		this._adjustment.connect('notify::value', this._onUpdateAdjustmentValue.bind(this));
-
 		this._connectHandlers.push(this._touchpadSwipeTracker.connect('begin', this._gestureBegin.bind(this)));
 		this._connectHandlers.push(this._touchpadSwipeTracker.connect('update', this._gestureUpdate.bind(this)));
 		this._connectHandlers.push(this._touchpadSwipeTracker.connect('end', this._gestureEnd.bind(this)));
 		this._extState = AltTabExtState.DEFAULT;
 	}
-
-	disable() {
+	destroy() {
 		this._extState = AltTabExtState.DISABLED;
 		this._connectHandlers.forEach(handle => this._touchpadSwipeTracker.disconnect(handle));
-		this._connectHandlers = [];
-
 		this._touchpadSwipeTracker.destroy();
-		delete this._touchpadSwipeTracker;
-		delete this._adjustment;
+		this._connectHandlers = [];
+		this._adjustment.run_dispose();
 		if (this._switcher) {
 			this._switcher.destroy();
+			this._switcher = undefined;
 		}
 	}
-
 	_onUpdateAdjustmentValue() {
-		if (this._extState === AltTabExtState.ALTTAB) {
-			let nelement = this._switcher._items.length;
+		if (this._extState === AltTabExtState.ALTTAB && this._switcher) {
+			const nelement = this._switcher._items.length;
 			if (nelement > 1) {
-				let n = Math.floor((nelement + 2) * this._adjustment.value);
-				n = Math.clamp(n, 1, nelement) - 1;
+				const n = getIndexForProgress(this._adjustment.value, nelement);
 				this._switcher._select(n);
-				let adjustment = this._switcher._switcherList._scrollView.hscroll.adjustment;
-				let transition = adjustment.get_transition('value');
+				const adjustment = this._switcher._switcherList._scrollView.hscroll.adjustment;
+				const transition = adjustment.get_transition('value');
 				if (transition) {
-					transition.advance(POPUP_SCROLL_TIME);
+					transition.advance(AltTabConstants.POPUP_SCROLL_TIME);
 				}
 			}
 		}
 	}
-
-	_gestureBegin(gesture, time, x, y) {
+	_gestureBegin() {
 		this._progress = 0;
-		if (Main.actionMode === Shell.ActionMode.NORMAL &&
-			this._extState === AltTabExtState.DEFAULT
-		) {
+		if (this._extState === AltTabExtState.DEFAULT) {
 			this._switcher = new WindowSwitcherPopup();
-			let nelement = this._switcher._items.length
-			if (nelement > 0) {
-				this._switcher.show(false, "switch-windows", 0);
-				if (this._switcher._noModsTimeoutId != 0) {
-					GLib.source_remove(this._switcher._noModsTimeoutId);
-					this._switcher._noModsTimeoutId = 0;
+			// remove timeout entirely
+			this._switcher._resetNoModsTimeout = function () {
+				if (this._noModsTimeoutId) {
+					GLib.source_remove(this._noModsTimeoutId);
+					this._noModsTimeoutId = 0;
 				}
+			};
+			const nelement = this._switcher._items.length;
+			if (nelement > 0) {
+				this._switcher.show(false, 'switch-windows', 0);
 				if (this._switcher._initialDelayTimeoutId !== 0) {
 					GLib.source_remove(this._switcher._initialDelayTimeoutId);
-        			this._switcher._initialDelayTimeoutId = 0;
+					this._switcher._initialDelayTimeoutId = 0;
 				}
-
+				const leftOver = AltTabConstants.MIN_WIN_COUNT - nelement;
+				if (leftOver > 0) {
+					dummyWinCount = Math.max(AltTabConstants.DUMMY_WIN_COUNT, Math.ceil(leftOver / 2));
+				}
+				else {
+					dummyWinCount = AltTabConstants.DUMMY_WIN_COUNT;
+				}
 				if (nelement === 1) {
 					this._switcher._select(0);
 					this._progress = 0;
-				} else {
-					this._progress = 2.5 / (nelement + 2);
+				}
+				else {
+					this._progress = getAvgProgressForIndex(1, nelement);
 					this._switcher._select(1);
 				}
 				this._adjustment.value = 0;
 				this._extState = AltTabExtState.ALTTABDELAY;
-				this._altTabTimeoutId = GLib.timeout_add(
-					GLib.PRIORITY_DEFAULT,
-					Constants.AltTabConstants.DELAY_DURATION,
-					() => {
-						Main.osdWindowManager.hideAll();
-        				this._switcher.opacity = 255;
-						this._adjustment.value = this._progress;
-						this._extState = AltTabExtState.ALTTAB;
-						this._altTabTimeoutId = 0;
-						return GLib.SOURCE_REMOVE;
-					}
-				);
-			} else {
+				this._altTabTimeoutId = GLib.timeout_add(GLib.PRIORITY_DEFAULT, AltTabConstants.DELAY_DURATION, () => {
+					Main.osdWindowManager.hideAll();
+					if (this._switcher)
+						this._switcher.opacity = 255;
+					this._adjustment.value = this._progress;
+					this._extState = AltTabExtState.ALTTAB;
+					this._altTabTimeoutId = 0;
+					return GLib.SOURCE_REMOVE;
+				});
+			}
+			else {
 				this._switcher.destroy();
+				this._switcher = undefined;
 			}
 		}
 	}
-
-	_gestureUpdate(gesture, time, delta, distance) {
+	_gestureUpdate(_gesture, _time, delta, distance) {
 		if (this._extState > AltTabExtState.ALTTABDELAY) {
 			this._progress = Math.clamp(this._progress + delta / distance, 0, 1);
 			this._adjustment.value = this._progress;
 		}
 	}
-
-	_gestureEnd(gesture, time, distance) {
+	_gestureEnd() {
 		if (this._extState === AltTabExtState.ALTTAB ||
-			this._extState === AltTabExtState.ALTTABDELAY) {
+            this._extState === AltTabExtState.ALTTABDELAY) {
 			this._extState = AltTabExtState.DEFAULT;
 			if (this._altTabTimeoutId != 0) {
 				GLib.source_remove(this._altTabTimeoutId);
 				this._altTabTimeoutId = 0;
 			}
-			let win = this._switcher._items[this._switcher._selectedIndex].window;
-			Main.activateWindow(win);
-			this._switcher.destroy();
-			this._switcher = null;
+			if (this._switcher) {
+				const win = this._switcher._items[this._switcher._selectedIndex].window;
+				Main.activateWindow(win);
+				this._switcher.destroy();
+				this._switcher = undefined;
+			}
 			this._progress = 0;
 			this._adjustment.value = 0;
 		}
 		this._extState = AltTabExtState.DEFAULT;
 	}
-
 	get state() {
 		return this._extState;
 	}

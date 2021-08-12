@@ -513,6 +513,7 @@ const ColorPicker = GObject.registerClass({
             this._button.add_actor(this.icon);
             this._button.connect('left-click', this._beginPick.bind(this));
             Main.panel.addToStatusArea(Me.metadata.uuid, this._button);
+            this._updateMenu();
         } else {
             if(this._icon) {
                 this._icon.destroy();
@@ -525,6 +526,7 @@ const ColorPicker = GObject.registerClass({
     }
 
     _updateMenu() {
+        if(!this._button) return;
         this._button.menu.removeAll();
         let colors = this._menu_style == MENU.HISTORY ? this._history : this._collect;
         if(colors) {
@@ -616,7 +618,7 @@ const ColorPicker = GObject.registerClass({
             Main.osdWindowManager.show(index, icon, color, null, 2);
             let clearId = osd._box.connect('notify::mapped', box => {
                 if(box.mapped) return Clutter.EVENT_STOP;
-                osd._icon.set_style('color: none;');
+                osd._icon.set_style('');
                 osd._box.disconnect(clearId);
                 return Clutter.EVENT_STOP;
             });

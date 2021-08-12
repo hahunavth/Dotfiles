@@ -8,7 +8,6 @@ const Me = imports.misc.extensionUtils.getCurrentExtension();
 const Settings = Me.imports.settings;
 const Utils = Me.imports.utilities;
 const PaintSignals = Me.imports.paint_signals;
-let prefs = new Settings.Prefs;
 
 const dash_to_panel_uuid = 'dash-to-panel@jderose9.github.com';
 const default_sigma = 30;
@@ -17,15 +16,17 @@ const default_brightness = 0.6;
 let sigma = 30;
 
 var PanelBlur = class PanelBlur {
-    constructor(connections) {
+    constructor(connections, prefs) {
         this.connections = connections;
         this.paint_signals = new PaintSignals.PaintSignals(connections);
+        this.prefs = prefs;
         this.effect = new Shell.BlurEffect({
             brightness: default_brightness,
             sigma: default_sigma,
             mode: prefs.STATIC_BLUR.get() ? 0 : 1
         });
         this.background_parent = new St.Widget({
+            name: 'topbar-blurred-background-parent',
             style_class: 'topbar-blurred-background-parent',
             x: this.monitor.x,
             y: this.monitor.y,
@@ -46,6 +47,10 @@ var PanelBlur = class PanelBlur {
         this._log("blurring top panel");
 
         // insert background parent
+        let children = Main.layoutManager.panelBox.get_children();
+        for (let i = 0; i < children.length; ++i)
+            if (children[i].name == 'topbar-blurred-background-parent')
+                Main.layoutManager.panelBox.remove_child(children[i]);
         Main.layoutManager.panelBox.insert_child_at_index(this.background_parent, 0);
         // hide corners, can't style them
         Main.panel._leftCorner.hide();
@@ -59,14 +64,14 @@ var PanelBlur = class PanelBlur {
 
         // connect to size, monitor or wallpaper changes
         this.connections.connect(Main.panel, 'notify::height', () => {
-            this.update_size(prefs.STATIC_BLUR.get());
+            this.update_size(this.prefs.STATIC_BLUR.get());
         });
         this.connections.connect(Main.layoutManager, 'monitors-changed', () => {
-            this.update_wallpaper(prefs.STATIC_BLUR.get());
-            this.update_size(prefs.STATIC_BLUR.get());
+            this.update_wallpaper(this.prefs.STATIC_BLUR.get());
+            this.update_size(this.prefs.STATIC_BLUR.get());
         });
         this.connections.connect(backgroundSettings, 'changed', () => {
-            Utils.setTimeout(() => { this.update_wallpaper(prefs.STATIC_BLUR.get()) }, 100);
+            Utils.setTimeout(() => { this.update_wallpaper(this.prefs.STATIC_BLUR.get()) }, 100);
         });
 
         // connect to overview
@@ -82,7 +87,7 @@ var PanelBlur = class PanelBlur {
     }
 
     change_blur_type() {
-        let is_static = prefs.STATIC_BLUR.get();
+        let is_static = this.prefs.STATIC_BLUR.get();
 
         this.background_parent.remove_child(this.background);
         this.background.remove_effect(this.effect);
@@ -107,7 +112,7 @@ var PanelBlur = class PanelBlur {
             // ! but it prevents the shadows of the panel buttons to cause artefacts on the panel itself
             // ! note: issue opened at https://gitlab.gnome.org/GNOME/gnome-shell/-/issues/2857
 
-            if (prefs.HACKS_LEVEL.get() == 1) {
+            if (this.prefs.HACKS_LEVEL.get() == 1) {
                 this._log("panel hack level 1");
                 this.paint_signals.disconnect_all();
 
@@ -124,9 +129,11 @@ var PanelBlur = class PanelBlur {
                     this.connections.connect(child, 'leave-event', rp);
                     this.connections.connect(child, 'button-press-event', rp);
                 });
-            } else if (prefs.HACKS_LEVEL.get() == 2) {
+            } else if (this.prefs.HACKS_LEVEL.get() == 2) {
                 this._log("panel hack level 2");
+                this.paint_signals.disconnect_all();
 
+                this.paint_signals.connect(Main.panel, this.effect);
                 Main.panel.get_children().forEach(child => {
                     this.paint_signals.connect(child, this.effect);
                 });
@@ -146,16 +153,20 @@ var PanelBlur = class PanelBlur {
     }
 
     update_size(is_static) {
-        this.background_parent.width = this.monitor.width;
-        this.background.width = this.monitor.width;
+        this.background_parent.width = Main.panel.width;
+        this.background.width = Main.panel.width;
         this.background.height = Main.panel.height;
+        let panel_box = Main.layoutManager.panelBox;
+        let clip_box = panel_box.get_parent();
         if (is_static) {
             this.background.set_clip(
-                0,
-                0,
-                this.monitor.width,
-                Main.panel.height
+                clip_box.x,
+                clip_box.y,
+                panel_box.width,
+                panel_box.height
             );
+            this.background.x = -clip_box.x;
+            this.background.y = -clip_box.y;
         }
     }
 
@@ -172,7 +183,12 @@ var PanelBlur = class PanelBlur {
     }
 
     get monitor() {
-        return Main.layoutManager.primaryMonitor
+        if (Main.layoutManager.primaryMonitor != null) {
+            return Main.layoutManager.primaryMonitor
+        }
+        else {
+            return { x: 0, y: 0, width: 0, index: 0 }
+        }
     }
 
     set_sigma(s) {
@@ -190,7 +206,7 @@ var PanelBlur = class PanelBlur {
         Main.panel.remove_style_class_name('transparent-panel');
 
         try {
-            Main.layoutManager.panelBox.get_parent().remove_child(this.background_parent);
+            Main.layoutManager.panelBox.remove_child(this.background_parent);
         } catch (e) { }
 
         this.connections.disconnect_all();
@@ -204,6 +220,7 @@ var PanelBlur = class PanelBlur {
     }
 
     _log(str) {
-        log(`[Blur my Shell] ${str}`)
+        if (this.prefs.DEBUG.get())
+            log(`[Blur my Shell] ${str}`)
     }
 }
