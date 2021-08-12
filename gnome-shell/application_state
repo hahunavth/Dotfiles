@@ -23,20 +23,20 @@
     <application id="libreoffice-writer.desktop" score="22.03125" last-seen="1628774351"/>
     <application id="microsoft-edge-dev.desktop" score="15535.322321323445" last-seen="1628778559"/>
     <application id="org.freedesktop.GnomeAbrt.desktop" score="0" last-seen="1628774508"/>
-    <application id="org.gnome.Terminal.desktop" score="2397.4065780069213" last-seen="1628778532"/>
+    <application id="org.gnome.Terminal.desktop" score="2404.4065780069213" last-seen="1628778866"/>
     <application id="org.gnome.Shell.Extensions.desktop" score="8" last-seen="1628689063"/>
-    <application id="wps-office-prometheus.desktop" score="132" last-seen="1628778551"/>
+    <application id="wps-office-prometheus.desktop" score="152" last-seen="1628778876"/>
     <application id="com.obsproject.Studio.desktop" score="2080.6875" last-seen="1628238961"/>
-    <application id="org.gnome.Nautilus.desktop" score="670.09668345446698" last-seen="1628778556"/>
+    <application id="org.gnome.Nautilus.desktop" score="676.09668345446698" last-seen="1628778871"/>
     <application id="org.gnome.FileRoller.desktop" score="0" last-seen="1628774277"/>
     <application id="jetbrains-idea-ce.desktop" score="2" last-seen="1628690508"/>
     <application id="org.gnome.Totem.desktop" score="6" last-seen="1628343479"/>
     <application id="wps-2019-snap_wps.desktop" score="0" last-seen="1628776520"/>
-    <application id="wps-2019-snap_wpp.desktop" score="3" last-seen="1628778310"/>
+    <application id="wps-2019-snap_wpp.desktop" score="5" last-seen="1628778759"/>
     <application id="google-chrome.desktop" score="8742.3457364325877" last-seen="1628777833"/>
-    <application id="org.gnome.baobab.desktop" score="995" last-seen="1628778421"/>
+    <application id="org.gnome.baobab.desktop" score="995" last-seen="1628778869"/>
     <application id="teams.desktop" score="955.61281480803154" last-seen="1628343963"/>
-    <application id="org.gnome.gedit.desktop" score="9.5" last-seen="1628772930"/>
+    <application id="org.gnome.gedit.desktop" score="11.5" last-seen="1628778688"/>
     <application id="org.rnd2.cpupower_gui.desktop" score="7" last-seen="1628238580"/>
   </context>
 </application-state>
