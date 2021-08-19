@@ -3,7 +3,6 @@
 .zshenv
 .zsh_history
 .taskrc
-.git-credentials
 .config/nvim/init.vim
 .config/onedrive/
 .local/share/gnome-shell
