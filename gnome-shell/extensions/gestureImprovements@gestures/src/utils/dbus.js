@@ -65,12 +65,12 @@ function subscribe(callback) {
 			type: () => Clutter.EventType.TOUCHPAD_SWIPE,
 			get_gesture_phase: () => {
 				switch (sphase) {
-				case 'Begin':
-					return Clutter.TouchpadGesturePhase.BEGIN;
-				case 'Update':
-					return Clutter.TouchpadGesturePhase.UPDATE;
-				default:
-					return Clutter.TouchpadGesturePhase.END;
+					case 'Begin':
+						return Clutter.TouchpadGesturePhase.BEGIN;
+					case 'Update':
+						return Clutter.TouchpadGesturePhase.UPDATE;
+					default:
+						return Clutter.TouchpadGesturePhase.END;
 				}
 			},
 			get_touchpad_gesture_finger_count: () => fingers,

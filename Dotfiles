@@ -1,7 +1,9 @@
 .vimrc
 .zshrc
 .zshenv
+.zsh_history
 .taskrc
+.git-credentials
 .config/nvim/init.vim
 .config/onedrive/
 .local/share/gnome-shell
@@ -9,3 +11,5 @@
 .icons
 .autojump
 .fonts
+.local/share/todo.txt/todo.txt
+.local/share/todo.txt/done.txt

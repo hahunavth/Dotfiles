@@ -9,6 +9,7 @@ const { SwipeTracker } = imports.ui.swipeTracker;
 const Me = imports.misc.extensionUtils.getCurrentExtension();
 const DBusUtils = Me.imports.src.utils.dbus;
 const { TouchpadConstants } = Me.imports.constants;
+// define enum
 var TouchpadState;
 (function (TouchpadState) {
 	TouchpadState[TouchpadState['NONE'] = 0] = 'NONE';
@@ -122,18 +123,18 @@ var TouchpadSwipeGesture = GObject.registerClass({
 		let delta = ((vertical !== this._toggledDirection) ? dy : dx) * this.SWIPE_MULTIPLIER;
 		const distance = vertical ? this.TOUCHPAD_BASE_HEIGHT : this.TOUCHPAD_BASE_WIDTH;
 		switch (gesturePhase) {
-		case Clutter.TouchpadGesturePhase.BEGIN:
-		case Clutter.TouchpadGesturePhase.UPDATE:
-			if (this._followNaturalScroll)
-				delta = -delta;
-			this.emit('update', time, delta, distance);
-			break;
-		case Clutter.TouchpadGesturePhase.END:
-		case Clutter.TouchpadGesturePhase.CANCEL:
-			this.emit('end', time, distance);
-			this._state = TouchpadState.NONE;
-			this._toggledDirection = false;
-			break;
+			case Clutter.TouchpadGesturePhase.BEGIN:
+			case Clutter.TouchpadGesturePhase.UPDATE:
+				if (this._followNaturalScroll)
+					delta = -delta;
+				this.emit('update', time, delta, distance);
+				break;
+			case Clutter.TouchpadGesturePhase.END:
+			case Clutter.TouchpadGesturePhase.CANCEL:
+				this.emit('end', time, distance);
+				this._state = TouchpadState.NONE;
+				this._toggledDirection = false;
+				break;
 		}
 		return this._state === TouchpadState.HANDLING
 			? Clutter.EVENT_STOP

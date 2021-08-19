@@ -1,0 +1,9 @@
+x 2021-07-14 rake db:migrate
+x 2021-07-14 rails generate scaffold <tên bảng> <tên trường 1:kiểu dữ liệu> <tên trường 2:kiểu dữ liệu>...<tên trường n:kiểu dữ liệu>
+x 2021-07-14 rails generate controller <tên controller> <tên route 1> <tên route 2>....<tên route n>
+x 2021-07-28 Triet T3 t3 30'+ ke hoach thi
+x 2021-08-19 30/7: tuan sau pldc 2 ktra
+x 2021-08-19 sudo update-alternatives --config java
+x 2021-08-19 T2 de cuong triet bo 7 cau
+x 2021-08-19 Giao trinh PLDC -> Tieu luan
+x 2021-08-19 Tai lieu triet
