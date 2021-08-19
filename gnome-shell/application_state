@@ -20,16 +20,16 @@
     <application id="org.gnome.font-viewer.desktop" score="0" last-seen="1628778466"/>
     <application id="org.gnome.Epiphany.desktop" score="21.5" last-seen="1628922986"/>
     <application id="org.freedesktop.GnomeAbrt.desktop" score="0" last-seen="1628774508"/>
-    <application id="org.gnome.Extensions.desktop" score="6" last-seen="1629353730"/>
+    <application id="org.gnome.Extensions.desktop" score="7" last-seen="1629353811"/>
     <application id="code_code.desktop" score="11043.310546875" last-seen="1629340530"/>
     <application id="com.github.persepolisdm.persepolis.desktop" score="0" last-seen="0"/>
     <application id="microsoft-edge-dev.desktop" score="8915.1611606617225" last-seen="1629048705"/>
     <application id="wps-office-prometheus.desktop" score="606.5" last-seen="1629350840"/>
-    <application id="org.gnome.Terminal.desktop" score="3671.2032890034607" last-seen="1629353726"/>
+    <application id="org.gnome.Terminal.desktop" score="3697.2032890034607" last-seen="1629354062"/>
     <application id="org.gnome.Shell.Extensions.desktop" score="4.5" last-seen="1628927334"/>
     <application id="org.gnome.Epiphany.WebApp-notion-486af5da11b1d7b984dd0eec94e15310e479449f.desktop" score="2" last-seen="1628922978"/>
     <application id="org.gnome.Boxes.desktop" score="0" last-seen="1629298378"/>
-    <application id="org.gnome.Nautilus.desktop" score="569.54834172723349" last-seen="1629353613"/>
+    <application id="org.gnome.Nautilus.desktop" score="573.54834172723349" last-seen="1629353846"/>
     <application id="jetbrains-idea-ce.desktop" score="2" last-seen="1629012773"/>
     <application id="wps-2019-snap_wpp.desktop" score="3.5" last-seen="1628779724"/>
     <application id="org.gnome.FileRoller.desktop" score="35.5" last-seen="1629351170"/>
@@ -37,8 +37,8 @@
     <application id="org.gnome.Totem.desktop" score="9.5" last-seen="1629350786"/>
     <application id="com.obsproject.Studio.desktop" score="33" last-seen="1628931442"/>
     <application id="org.gnome.Sudoku.desktop" score="0" last-seen="1628907955"/>
-    <application id="google-chrome.desktop" score="20385.172868216294" last-seen="1629352801"/>
-    <application id="org.gnome.baobab.desktop" score="550.5" last-seen="1629353455"/>
+    <application id="google-chrome.desktop" score="20406.172868216294" last-seen="1629354167"/>
+    <application id="org.gnome.baobab.desktop" score="555.5" last-seen="1629353847"/>
     <application id="teams.desktop" score="899.80640740401577" last-seen="1629012669"/>
     <application id="io.elementary.code.desktop" score="19" last-seen="1629342775"/>
     <application id="org.gnome.gedit.desktop" score="19.75" last-seen="1629353608"/>
