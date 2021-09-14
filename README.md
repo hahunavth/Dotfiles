@@ -56,12 +56,11 @@ cd ~/.pyenv && src/configure && make -C src
 pyenv install --list
 python -v
 pip install --upgrade pip
-
-
 ```
 
 ### Package
 ```bash
-sudo apt install nethogs ranger 
+sudo apt install nethogs ranger synaptic
+
 snap install alacritty atom notion-snap sublime-text
 ```
