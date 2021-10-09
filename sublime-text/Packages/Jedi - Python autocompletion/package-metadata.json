@@ -1,0 +1,1 @@
+{"url": "https://github.com/srusskih/SublimeJEDI", "platforms": ["*"], "version": "0.18.0", "sublime_text": ">=3000", "dependencies": [], "description": "awesome Python autocompletion with SublimeText"}

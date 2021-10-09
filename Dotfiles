@@ -3,8 +3,9 @@
 .zshenv
 .zsh_history
 .taskrc
+.config/alacritty/
 .config/nvim/init.vim
 .config/onedrive/
+.config/sublime-text
 .local/share/gnome-shell
-.autojump
 .fonts
