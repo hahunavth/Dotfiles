@@ -1,3 +1,0 @@
-Os-Catalina-gtk.
-
-
