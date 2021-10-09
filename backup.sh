@@ -3,7 +3,7 @@
 git pull origin eos
 while read f; do
     echo "Backup file $f..."
-    cp -rf $HOME/$f ./$f 
+    cp -rf $HOME/$f ./data/ 
 done < Dotfiles
 echo "Backup files done, please commit!"
 

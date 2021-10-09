@@ -1,7 +1,0 @@
-x 2021-05-30 scanf("%d%*c", &cmd);
-chrome://flags/#enable-webrtc-pipewire-capturer
-heroku addons:create heroku-postgresql --app qldc
-heroku run rake db:migrate --app qldc
-rails db:system:change --to=postgresql
-heroku pg:reset DATABASE_URL -a qldc
-mongod --dbpath /var/lib/mongo --logpath /var/log/mongodb/mongod.log --fork
