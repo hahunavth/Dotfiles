@@ -71,5 +71,4 @@ snap install alacritty atom notion-snap sublime-text heroku
 ```
 #### Flatpak
 ```sh
-
 ```
