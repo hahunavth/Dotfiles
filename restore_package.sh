@@ -1,1 +1,1 @@
-yum -y install $(cat installed-software.bak)
+yum -y install $(cat ./list/installed-software.bak)
