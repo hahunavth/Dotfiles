@@ -1,5 +1,5 @@
-echo 'EXEC: rpm -qa > ./package_all.bak'
-rpm -qa > ./list/package_all.bak
+# echo 'EXEC: rpm -qa > ./package_all.bak'
+# rpm -qa > ./list/package_all.bak
 echo 'EXEC: sudo dnf history userinstalled > ./package_user.bak'
 apt-mark showmanual > ./list/package_user.bak
 echo 'EXEC: snap list > package_snap.bak'
