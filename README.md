@@ -56,11 +56,20 @@ cd ~/.pyenv && src/configure && make -C src
 pyenv install --list
 python -v
 pip install --upgrade pip
+
+# r
+sudo apt-get install r-base r-base-dev
+
 ```
 
 ### Package
+#### Debian
+- For debian: [Debian.md](./Debian.md)
+#### Snap
 ```bash
-sudo apt install nethogs ranger synaptic
+snap install alacritty atom notion-snap sublime-text heroku
+```
+#### Flatpak
+```sh
 
-snap install alacritty atom notion-snap sublime-text
 ```

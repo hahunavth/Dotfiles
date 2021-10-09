@@ -196,6 +196,9 @@ export NVM_DIR=~/.nvm
  [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  
 # This loads nvm bash_completion
 
+export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
+
 
 export PATH="$PATH:`yarn global bin`"
 
@@ -230,9 +233,7 @@ export PATH=$PATH:$ANDROID_HOME/platform-tools
 export PATH="$HOME/.local/bin:$PATH"
 
 # Add RVM to PATH for scripting. Make sure this is the last PATH variable change.
-export PATH="$PATH:$HOME/.rvm/bin"
-source /home/kryo/.rvm/scripts/rvm
+# export PATH="$PATH:$HOME/.rvm/bin"
+# source /home/kryo/.rvm/scripts/rvm
 
-
-# thefuck startup
-eval $(thefuck --alias)
+export PATH=~/anaconda3/bin:$PATH
