@@ -13,7 +13,7 @@ Clips	com.github.hezral.clips	1.0.3	stable	appcenter	user
 insomnia translations	com.github.manexim.insomnia.Locale		stable	appcenter	user
 Minder	com.github.phase1geo.minder	1.13.1	stable	appcenter	user
 Response	com.github.rajsolai.response	1.1.0	stable	flathub	user
-louper translations	com.github.ryonakano.louper.Locale		stable	appcenter	user
+Louper	com.github.ryonakano.louper	1.0.0	stable	appcenter	user
 Enigma	com.github.subhadeepjasu.enigma	1.0.1	stable	appcenter	user
 Frog	com.github.tenderowl.frog	0.1.7	stable	appcenter	user
 Turtle	com.github.tenderowl.turtle	0.1.0	stable	appcenter	user
@@ -33,6 +33,7 @@ Dot Matrix	io.github.lainsce.DotMatrix	3.0.2	stable	flathub	user
 Github-desktop	io.github.shiftey.Desktop	2.9.3	stable	flathub	user
 Typora	io.typora.Typora	0.11.8	stable	flathub	user
 Shooting Pactris	me.njean.shootingpactris	1.2	stable	flathub	user
+Anki	net.ankiweb.Anki	2.1.48	stable	flathub	user
 Color Picker	nl.hjdskes.gcolor3	2.4.0	stable	flathub	user
 Flameshot	org.flameshot.Flameshot	0.10.1	stable	flathub	user
 Flatpak Developer Demo	org.flatpak.qtdemo	1.1.3	stable	flathub	user
