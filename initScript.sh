@@ -1,5 +1,8 @@
 ### Manjaro 21.2 init
 
+# Oh my zsh
+sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+
 # Dual boot time fix
 timedatectl set-local-rtc 1 --adjust-system-clock
 
